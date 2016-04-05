@@ -1,0 +1,28 @@
+{
+  "name": "cosmic-fighter",
+  "version": "0.0.0",
+  "description": "Multiplayer game using NodeJS back-end with HTML5 Canvas and JavaScript front-end.",
+  "main": "index.js",
+  "dependencies": {
+    "browserify": "^13.0.0",
+    "express": "^4.13.4",
+    "jquery": "^2.2.2",
+    "socket.io": "^1.4.5",
+    "uglify-js": "^2.6.2"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.1",
+    "watchify": "^3.7.0"
+  },
+  "scripts": {
+    "build-client": "browserify ./client/src/index.js -s cf | uglifyjs -mc > ./client/dist/game.js",
+    "build": "npm run build-client",
+    "watch-client": "watchify ./client/src/index.js -s cf -o ./client/dist/game.js -v -d",
+    "watch": "npm run watch-client",
+    "start": "node ./server/app.js",
+    "pretest": "jshint ./src",
+    "test": "echo \"Tests Complete\""
+  },
+  "author": "Hector Fernando Pineiro II",
+  "license": "MIT"
+}

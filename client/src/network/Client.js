@@ -2,9 +2,8 @@
 
 var entities = require('../entities');
 
-var Client = function (id, data) {
+var Client = function (id) {
     this.id = id;
-    this.data = data;
     this.gameObject = new entities.ClientPlayer();
 };
 Object.freeze(Client);

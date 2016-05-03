@@ -58,7 +58,7 @@ var GameScene = function (canvas) {
     );
     
     this.player = Network.localClient.gameObject;
-    this.addGameObject(this.player);
+    this.addGameObject(this.player, 2);
 };
 Object.defineProperties(GameScene, {
     FRICTION : {
@@ -77,8 +77,10 @@ Object.defineProperties(GameScene, {
 GameScene.prototype = Object.freeze(Object.create(NetworkScene.prototype, {
     update : {
         value : function (dt) {
-            for (var i = 0; i < this.gameObjects.length; i++) {
-                var obj = this.gameObjects[i];
+            var gameObjects = this.getGameObjects();
+        
+            for (var i = 0; i < gameObjects.length; i++) {
+                var obj = gameObjects[i];
                 obj.acceleration.multiply(GameScene.FRICTION);
                 obj.velocity.multiply(GameScene.FRICTION);
             }

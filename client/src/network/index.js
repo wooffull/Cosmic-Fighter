@@ -1,8 +1,5 @@
 "use strict";
 
-var Client = require('./Client.js');
-var LocalClient = require('./LocalClient.js');
-
 var Network = {
     socket      : undefined,
     localClient : {},
@@ -21,7 +18,7 @@ var Network = {
         this.socket.on('addOther', this.onAddOtherClient.bind(this));
         this.socket.on('removeOther', this.onRemoveOtherClient.bind(this));
         this.socket.on('loadPrevious', this.onLoadPreviousClients.bind(this));
-        this.socket.on('updateOther', this.onUpdateOtherClient.bind(this));
+        this.socket.on('updateOther', this.onUpdateClient.bind(this));
 
         this.socket.emit('init', {
             user : "user"
@@ -30,11 +27,10 @@ var Network = {
 
     onConfirmClient : function (data) {
         var id = data.id;
-        this.localClient = new LocalClient(id, data);
+        this.localClient = new LocalClient(id);
         this.clients[id] = this.localClient;
 
-        this.localClient.gameObject.position.x = data.x;
-        this.localClient.gameObject.position.y = data.y;
+        this.onUpdateClient(data);
 
         this.connected = true;
 
@@ -45,15 +41,11 @@ var Network = {
 
     onAddOtherClient : function (data) {
         var id = data.id;
-        var newClient = new Client(id, data);
-
-        newClient.gameObject.position.x = data.x;
-        newClient.gameObject.position.y = data.y;
-        newClient.gameObject.desiredPosition.x = data.x;
-        newClient.gameObject.desiredPosition.y = data.y;
-        newClient.gameObject.setRotation(data.rotation);
+        var newClient = new Client(id);
 
         this.clients[data.id] = newClient;
+        
+        this.onUpdateClient(data);
 
         $(this).trigger(
             this.event.ADD_CLIENT,
@@ -82,38 +74,21 @@ var Network = {
         }
     },
 
-    onUpdateOtherClient : function (data) {
+    onUpdateClient : function (data) {
         var id = data.id;
         var client = this.clients[id];
 
-        client.data.x = data.x;
-        client.data.y = data.y;
-        client.gameObject.desiredPosition.x = data.x;
-        client.gameObject.desiredPosition.y = data.y;
-        client.data.rotation = data.rotation;
-    },
-
-    /**
-     * Callback for when the application gains focus and needs all clients to
-     * snap into current location
-     */
-    onFocusUpdate : function () {
-        var keys = Object.keys(this.clients);
-
-        for (var i = 0; i < keys.length; i++) {
-            var id = parseInt(keys[i]);
-            var client = this.clients[id];
-
-            if (client !== this.localClient) {
-                var gameObject = client.gameObject;
-                gameObject.position.x = client.data.x;
-                gameObject.position.y = client.data.y;
-                gameObject.setRotation(client.data.rotation);
-                gameObject.velocity.multiply(0);
-                gameObject.acceleration.multiply(0);
-            }
-        }
+        client.gameObject.position.x = data.position.x;
+        client.gameObject.position.y = data.position.y;
+        client.gameObject.velocity.x = data.velocity.x;
+        client.gameObject.velocity.y = data.velocity.y;
+        client.gameObject.acceleration.x = data.acceleration.x;
+        client.gameObject.acceleration.y = data.acceleration.y;
+        client.gameObject.setRotation(data.rotation);
     }
 };
 
 module.exports = Network;
+
+var Client = require('./Client.js');
+var LocalClient = require('./LocalClient.js');

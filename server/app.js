@@ -8,7 +8,8 @@ var socket = require('./socket.js');
 var port = process.env.PORT || process.env.NODE_PORT || 3000;
 server.listen(port);
 
-app.use('/', express.static(path.resolve(__dirname, '../client/')));
+app.use('/assets', express.static(path.resolve(__dirname, '../client/')));
+app.use('/assets/assets', express.static(path.resolve(__dirname, '../client/')));
 
 socket.configureSockets(io);
 

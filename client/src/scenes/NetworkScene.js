@@ -23,7 +23,7 @@ var NetworkScene = function (canvas) {
         var client = Network.clients[id];
 
         if (client !== Network.localClient) {
-            this.addGameObject(client.gameObject);
+            this.addGameObject(client.gameObject, 1);
         }
     }
 };
@@ -31,7 +31,7 @@ NetworkScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     onAddClient : {
         value : function (e, client) {
             if (client) {
-                this.addGameObject(client.gameObject);
+                this.addGameObject(client.gameObject, 1);
             }
         }
     },
@@ -39,7 +39,7 @@ NetworkScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     onRemoveClient : {
         value : function (e, client) {
             if (client) {
-                this.removeGameObject(client.gameObject);
+                this.removeGameObject(client.gameObject, 1);
             }
         }
     }

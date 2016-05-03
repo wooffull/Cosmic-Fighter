@@ -1,8 +1,8 @@
 "use strict";
 
+var Network = require('./network');
 var util = require('./util');
 var Assets = util.Assets;
-var Network = require('./network');
 var scenes = require('./scenes');
 
 // Create game

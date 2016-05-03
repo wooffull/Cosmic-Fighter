@@ -58,7 +58,39 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
     update : {
         value : function (dt) {
             LivingObject.prototype.update.call(this, dt);
-
+            
+            // If the player is connected to the network, send out updates to
+            // other players when necessary
+            if (Network.connected) {
+                Network.socket.emit('updateOther', {
+                    position     : this.position,
+                    velocity     : this.velocity,
+                    acceleration : this.acceleration,
+                    rotation     : this.getRotation()
+                });
+            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+/*
             // If the player is connected to the network, send out updates to
             // other players when necessary
             if (Network.connected) {
@@ -95,6 +127,7 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                     this.lastSentPosition = this.position.clone();
                 }
             }
+*/
         }
     },
 

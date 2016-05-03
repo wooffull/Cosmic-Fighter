@@ -14,11 +14,12 @@ var configureSockets = function (socketio) {
         socket.on('init', function (data) {
             // Set up and add client object
             var client = {
-                user     : data.user,
-                id       : clientCounter,
-                x        : Math.random() * 200 - 100,
-                y        : Math.random() * 200 - 100,
-                rotation : -Math.PI * 0.5
+                user         : data.user,
+                id           : clientCounter,
+                position     : { x : Math.random() * 200 - 100, y : Math.random() * 200 - 100 },
+                velocity     : { x : 0, y : 0 },
+                acceleration : { x : 0, y : 0 },
+                rotation     : -Math.PI * 0.5
             };
             clients[clientCounter] = client;
 
@@ -48,15 +49,17 @@ var configureSockets = function (socketio) {
         socket.on('updateOther', function (data) {
             if (clients[id]) {
                 var updateData = {
-                    id       : id,
-                    x        : data.x,
-                    y        : data.y,
-                    rotation : data.rotation
+                    id           : id,
+                    position     : data.position,
+                    velocity     : data.velocity,
+                    acceleration : data.acceleration,
+                    rotation     : data.rotation
                 };
 
-                clients[id].x        = data.x;
-                clients[id].y        = data.y;
-                clients[id].rotation = data.rotation;
+                clients[id].position     = data.position;
+                clients[id].velocity     = data.velocity;
+                clients[id].acceleration = data.acceleration;
+                clients[id].rotation     = data.rotation;
 
                 socket.broadcast.emit('updateOther', updateData);
             }

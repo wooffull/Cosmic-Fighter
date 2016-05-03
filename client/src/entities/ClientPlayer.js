@@ -28,8 +28,6 @@ var ClientPlayer = function () {
     this.addState(GameObject.STATE.DEFAULT, this.defaultState);
 
     this.rotate(-Math.PI * 0.5);
-
-    this.desiredPosition = new geom.Vec2();
 };
 Object.defineProperties(ClientPlayer, {
     ARRIVAL_SLOWING_RADIUS : {
@@ -45,56 +43,6 @@ Object.defineProperties(ClientPlayer, {
     }
 });
 ClientPlayer.prototype = Object.freeze(Object.create(LivingObject.prototype, {
-    update : {
-        value : function (dt) {
-            this.arrivalSteer();
-
-            LivingObject.prototype.update.call(this, dt);
-
-            // Only update the forward direction of the client player if
-            // they're moving fast enough
-            if (this.velocity.getMagnitudeSquared() > 0.00001) {
-                // Rotate the client player
-                var angleDifference =
-                    this.velocity.getAngle() -
-                    this.forward.getAngle();
-                this.rotate(angleDifference);
-            }
-        }
-    },
-
-    arrivalSteer : {
-        value : function () {
-            var desiredVelocity = geom.Vec2.subtract(
-                this.desiredPosition,
-                this.position
-            );
-            var distanceSquared = desiredVelocity.getMagnitudeSquared();
-            var slowingRadius = ClientPlayer.ARRIVAL_SLOWING_RADIUS;
-
-            // Arrive to the desired position if far enough away
-            if (distanceSquared > ClientPlayer.MIN_ARRIVAL_RADIUS) {
-                // Set desired velocity to how quickly the player can move
-                desiredVelocity.setMagnitude(
-                    Player.BOOST_ACCELERATION * this.mass
-                );
-
-                if (distanceSquared < slowingRadius * slowingRadius) {
-                    desiredVelocity.multiply(
-                        0.925 * 0.925 *
-                        distanceSquared / (slowingRadius * slowingRadius)
-                    );
-                }
-
-                this.addForce(desiredVelocity);
-
-            // Force brakes when too close
-            } else {
-                this.velocity.multiply(0.925);
-            }
-        }
-    },
-
     drawOnMinimap : {
         value : function (ctx) {
             var w = this.getWidth();

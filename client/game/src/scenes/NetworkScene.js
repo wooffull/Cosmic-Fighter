@@ -3,23 +3,24 @@
 var Network = require('../network');
 var Scene = wfl.display.Scene;
 
-var NetworkScene = function (canvas) {
+var NetworkScene = function (canvas, roomId) {
     Scene.call(this, canvas);
     
     $(Network).on(
-        Network.event.ADD_CLIENT,
+        Network.Event.ADD_CLIENT,
         this.onAddClient.bind(this)
     );
     $(Network).on(
-        Network.event.REMOVE_CLIENT,
+        Network.Event.REMOVE_CLIENT,
         this.onRemoveClient.bind(this)
     );
 
     // Add other clients that are already connected
-    var keys = Object.keys(Network.clients);
+    var room = Network.rooms[roomId];
+    var players = room.players;
 
-    for (var i = 0; i < keys.length; i++) {
-        var id = parseInt(keys[i]);
+    for (var i = 0; i < players.length; i++) {
+        var id = players[i];
         var client = Network.clients[id];
 
         if (client !== Network.localClient) {

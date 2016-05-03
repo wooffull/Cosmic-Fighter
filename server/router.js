@@ -49,6 +49,12 @@ var router = function (app) {
     );
 
 	app.get(
+        "/rooms",
+        mid.requiresLogin,
+        controllers.Ship.shipPage
+    );
+
+	app.get(
         "/ship",
         mid.requiresLogin,
         controllers.Ship.shipPage

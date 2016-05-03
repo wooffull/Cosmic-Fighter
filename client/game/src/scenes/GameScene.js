@@ -10,8 +10,8 @@ var NetworkScene = require('./NetworkScene');
 var backgrounds = wfl.display.backgrounds;
 var geom = wfl.geom;
 
-var GameScene = function (canvas) {
-    NetworkScene.call(this, canvas);
+var GameScene = function (canvas, roomId) {
+    NetworkScene.call(this, canvas, roomId);
 
     var wallSize = 10;
     var blockSize = 128;

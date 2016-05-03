@@ -12,7 +12,8 @@ block body
       a(href="/account") Account
     .navlink
       a(href="/logout") Log Out
-    span#userSpan Logged in as #{owner}
+    span#userSpan Logged in as 
+      span#userName #{owner}
   div#game-content
     span(class="canvas-container")
       canvas#game-canvas(width="640" height="480")

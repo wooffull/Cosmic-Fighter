@@ -45,6 +45,12 @@ $(document).ready(function() {
 
         return false;
     });
+    
+    $("#signupForm").on("keypress", function (e) {
+        if(e.keyCode == 13) {
+            $("#signupSubmit").click();
+        }
+    });
 
     $("#loginSubmit").on("click", function (e) {
         e.preventDefault();
@@ -61,5 +67,11 @@ $(document).ready(function() {
         );
 
         return false;
+    });
+    
+    $("#loginForm").on("keypress", function (e) {
+        if(e.keyCode == 13) {
+            $("#loginSubmit").click();
+        }
     });
 });

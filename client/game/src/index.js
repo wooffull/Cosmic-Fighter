@@ -15,7 +15,7 @@ game.setScene(loadingScene);
 
 var onLoad = function () {
     $(Network).on(
-        Network.event.CONNECT,
+        Network.Event.CONNECT,
         onNetworkConnect
     );
 
@@ -29,10 +29,10 @@ var onNetworkConnect = function () {
     $(lobbyScene).on("play-game", onPlayGame);
 };
 
-var onPlayGame = function () {
+var onPlayGame = function (e, roomId) {
     $(game.getScene()).off();
     
-    var gameScene = new scenes.GameScene(canvas);
+    var gameScene = new scenes.GameScene(canvas, roomId);
     game.setScene(gameScene);
 };
 

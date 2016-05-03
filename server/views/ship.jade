@@ -11,7 +11,8 @@ block body
       a(href="/account") Account
     .navlink
       a(href="/logout") Log Out
-    span#userSpan Logged in as #{owner}
+    span#userSpan Logged in as 
+      span#userName #{owner}
   div#content
     h1 #{owner}'s Ships
     section#makeShip

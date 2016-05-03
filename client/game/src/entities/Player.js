@@ -69,65 +69,6 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                     rotation     : this.getRotation()
                 });
             }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-/*
-            // If the player is connected to the network, send out updates to
-            // other players when necessary
-            if (Network.connected) {
-                var displacementSinceUpdate = geom.Vec2.subtract(
-                    this.position,
-                    this.lastSentPosition
-                );
-                var distanceSquaredSinceUpdate =
-                    displacementSinceUpdate.getMagnitudeSquared();
-                var maxUpdateDistance = Player.POSITION_UPDATE_DISTANCE;
-
-                // If player has moved too far since last sending out an update
-                // for its position, send out a new position update and update
-                // the last-sent position
-                if (distanceSquaredSinceUpdate >=
-                    maxUpdateDistance * maxUpdateDistance) {
-
-                    var predictedVelocity = this.velocity.clone();
-                    predictedVelocity.add(
-                        this.acceleration.clone().multiply(3)
-                    );
-
-                    var predictedPos = this.position.clone();
-                    predictedPos.add(
-                        predictedVelocity.multiply(3)
-                    );
-
-                    Network.socket.emit('updateOther', {
-                        x        : predictedPos.x,
-                        y        : predictedPos.y,
-                        rotation : this.getRotation()
-                    });
-
-                    this.lastSentPosition = this.position.clone();
-                }
-            }
-*/
         }
     },
 

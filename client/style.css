@@ -1,5 +1,10 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
 
+@font-face {
+    font-family: "Munro";
+    src: url("font/Munro.ttf");
+}
+
 html, body {
     height: 100%;
     width: 100%;
@@ -28,7 +33,7 @@ html {
 
 form, #accountData {
     font-size: 1.2em;
-    
+
     margin-bottom: 0;
 }
 
@@ -40,7 +45,7 @@ form > label {
 nav {
     background-color: #31385A;
     padding: .8em 0 .8em 1em;
-    
+
     width: calc(100% - 1em);
 }
 
@@ -80,7 +85,7 @@ nav {
     padding: 1em;
     border-radius: 3px;
     margin-top: 1em;
-    
+
     width: calc(100% - 3em);
 }
 
@@ -95,50 +100,155 @@ a:hover {
 
 #game-canvas {
     display: block;
-    border: 2px solid gray;
     margin: auto;
 }
 
 .canvas-container {
+    font-family: Munro, sans-serif;
     display: inline-block;
     position: relative;
     margin-top: 1em;
+    border: 2px solid gray;
 }
 
 .canvas-overlay {
     position: absolute;
     display: inline-flex;
+    font-size: 18px;
 }
 
+.fade-in {
+    -webkit-animation: fadeIn .2s forwards linear;
+    animation: fadeIn .2s forwards linear;
+}
+
+/**
+ * LOBBY OVERLAY
+ */
 .lobby-overlay {
     width: 100%;
     height: 100%;
-    
+
     top: 0%;
     left: 0%;
-}
 
-.lobby-overlay-room-list, .lobby-overlay-cur-room {
-    width: 50%;
-    height: 100%;
-    
-    display: inline-block;
-    
-    background-color: #aaa;
-    border: 1px solid white;
+    background-color: #2F3435;
     box-sizing: border-box;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.lobby-overlay-left, .lobby-overlay-right {
+    height: 100%;
+    top: 0%;
+
+    display: inline-block;
+    padding: 1em;
+
+    box-sizing: border-box;
+    text-align: left;
+
+    transition: width .3s;
+}
+
+.lobby-overlay-left {
+    width: 40%;
+    left: 0%;
+}
+
+.lobby-overlay-right {
+    width: 60%;
+    left: 50%;
+}
+
+.lobby-overlay-button-container, .lobby-overlay-room-list {
+    width: 100%;
+    transition: height .3s;
+}
+
+.lobby-overlay-button-container {
+    height: 20%;
+}
+
 .lobby-overlay-room-list {
+    text-align: left;
+    height: 80%;
+}
+
+.lobby-overlay-button-container-min {
+    height: 0%;
+}
+
+.lobby-overlay-room-list-max {
+    height: 100%;
+}
+
+.lobby-overlay-room {
+    transition: background-color 0.1s;
+    margin: 0.25em 0;
+}
+
+.lobby-overlay-room:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.lobby-overlay-play-btn {
+    bottom: 0%;
+    right: 0%;
+
+    position: absolute;
+    margin: 1em;
+}
+
+/**
+ * CREATE ROOM OVERLAY
+ */
+.create-room-overlay {
+    width: 100%;
+    height: 100%;
+    
     left: 0%;
     top: 0%;
+    
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
-.lobby-overlay-cur-room {
+.create-room-overlay-input {
+    width: 60%;
+    height: 5%;
+    
     left: 50%;
-    top: 0%;
+    top: 50%;
+    
+    position: absolute;
+    transform: translate(-50%, -50%);
 }
 
+.create-room-overlay-button-container {
+    left: 50%;
+    top: 65%;
+    
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.create-room-overlay-button-container > button {
+    margin: 0 1em;
+}
+
+/**
+ * LOADING OVERLAY
+ */
 .loading-overlay {
     font-size: 5px;
     border-top: 1em solid #555;

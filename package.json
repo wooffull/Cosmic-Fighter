@@ -2,25 +2,36 @@
   "name": "cosmic-fighter",
   "version": "0.0.0",
   "description": "Multiplayer game using NodeJS back-end with HTML5 Canvas and JavaScript front-end.",
-  "main": "index.js",
+  "main": "./server/app.js",
   "dependencies": {
     "browserify": "^13.0.0",
-    "express": "^4.13.4",
     "jquery": "^2.2.2",
+    "uglify-js": "^2.6.2",
+    "body-parser": "^1.15.0",
+    "compression": "^1.6.1",
+    "connect-redis": "^3.0.2",
+    "cookie-parser": "^1.4.1",
+    "csurf": "^1.8.3",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "helmet": "^1.3.0",
+    "jade": "^1.11.0",
+    "mongoose": "^4.4.6",
+    "serve-favicon": "^2.3.0",
     "socket.io": "^1.4.5",
-    "uglify-js": "^2.6.2"
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "jshint": "^2.9.1",
     "watchify": "^3.7.0"
   },
   "scripts": {
-    "build-client": "browserify ./client/src/index.js -s cf | uglifyjs -mc > ./client/dist/game.js",
+    "build-client": "browserify ./client/game/src/index.js -s cf | uglifyjs -mc > ./client/game/dist/game.js",
     "build": "npm run build-client",
-    "watch-client": "watchify ./client/src/index.js -s cf -o ./client/dist/game.js -v -d",
+    "watch-client": "watchify ./client/game/src/index.js -s cf -o ./client/game/dist/game.js -v -d",
     "watch": "npm run watch-client",
     "start": "node ./server/app.js",
-    "pretest": "jshint ./src",
+    "pretest": "jshint ./server",
     "test": "echo \"Tests Complete\""
   },
   "author": "Hector Fernando Pineiro II",

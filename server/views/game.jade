@@ -1,0 +1,23 @@
+extends ./base.jade
+block append style
+    link(rel="stylesheet", type="text/css", href="/assets/normalize.css")
+    link(rel="stylesheet", type="text/css", href="/assets/style.css")
+block body
+  nav
+    .navlink
+      a(href="/game") Game
+    .navlink
+      a(href="/ship") Ships
+    .navlink
+      a(href="/account") Account
+    .navlink
+      a(href="/logout") Log Out
+    span#userSpan Logged in as #{owner}
+  div#game-content
+    span(class="canvas-container")
+      canvas#game-canvas(width="640" height="480")
+block scripts
+    script(src="/socket.io/socket.io.js")
+    script(src="/assets/lib/preloadjs-0.6.1.min.js")
+    script(src="/assets/lib/wfl.js")
+    script(src="/assets/game/dist/game.js")

@@ -1,0 +1,47 @@
+extends ./base.jade
+block append style
+    link(rel="stylesheet", type="text/css", href="/assets/style.css")
+block body
+  nav
+    .navlink
+      a(href="/game") Game
+    .navlink
+      a(href="/ship") Ships
+    .navlink
+      a(href="/account") Account
+    .navlink
+      a(href="/logout") Log Out
+    span#userSpan Logged in as #{owner}
+  div#content
+    h1 #{owner}'s Ships
+    section#makeShip
+      form#shipForm(class="shipForm", name="shipForm", action="/ship", method="POST")
+        label(for="name") Name:
+        input#shipName(type="text", name="name", placeholder="Ship Name")
+        br
+        label(for="bullet") Bullet Type:
+        select#shipBullet(name="bullet")
+          option(value="rapid" selected="true") Rapid
+          option(value="charge") Charge
+        br
+        input(type="hidden", name="_csrf", value="#{csrfToken}")
+        a#makeShipSubmit(class="makeShipSubmit", href="#") Make New Ship
+    section#ships
+      if !ships || ships.length == 0
+        div.ship
+          h3.emptyShip No ships yet
+      else
+        each val in ships
+          div.ship
+            div.shipContainer
+              img(class="shipImg", src="/assets/img/Ship.png", alt="ship")
+            div.shipName Name: #{val.name}
+            div.shipBullet Bullet Type: #{val.bullet}
+            div.shipLevel Level: #{val.level}
+            form(class="shipRemoveForm", name="shipRemoveForm", action="/remove", method="POST")
+              input(type="hidden", name="createdData", value="#{val.createdData}")
+              input(type="hidden", name="_csrf", value="#{csrfToken}")
+              br
+              a(class="removeShipSubmit", href="#") Remove This Ship
+block scripts
+    script(src="/assets/shipMaker.js")

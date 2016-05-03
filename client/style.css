@@ -1,0 +1,180 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: #071213;
+    background-image: url("/assets/img/css-BG-tile1.png");
+    font-family: "Source Sans Pro", sans-serif;
+    color: #E8E6E6;
+}
+
+#title {
+    margin: auto;
+}
+
+#content {
+    margin-left: 1em;
+}
+
+#game-content {
+    text-align: center;
+}
+
+form, #accountData {
+    font-size: 1.2em;
+    
+    margin-bottom: 0;
+}
+
+form > label {
+    display: inline-block;
+    width: 5.5em;
+}
+
+nav {
+    background-color: #31385A;
+    padding: .8em 0 .8em 1em;
+    
+    width: calc(100% - 1em);
+}
+
+.navlink, #userSpan {
+    display: inline;
+    margin-right: 2em;
+}
+
+#userSpan {
+    font-style: italic;
+    color: #ccc;
+}
+
+.shipImg {
+    display: block;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+               rotate(-90deg);
+}
+
+.shipContainer {
+    background-color: #E8E6E6;
+    border: solid 3px black;
+    border-radius: 3px;
+    width: 64px;
+    height: 64px;
+}
+
+.shipBullet {
+    text-transform: capitalize;
+}
+
+.ship {
+    background-color: #31385A;
+    padding: 1em;
+    border-radius: 3px;
+    margin-top: 1em;
+    
+    width: calc(100% - 3em);
+}
+
+a {
+    text-decoration: none;
+    color: #E0C99F;
+}
+
+a:hover {
+    color: #fff;
+}
+
+#game-canvas {
+    display: block;
+    border: 2px solid gray;
+    margin: auto;
+}
+
+.canvas-container {
+    display: inline-block;
+    position: relative;
+    margin-top: 1em;
+}
+
+.canvas-overlay {
+    position: absolute;
+    display: inline-flex;
+}
+
+.lobby-overlay {
+    width: 100%;
+    height: 100%;
+    
+    top: 0%;
+    left: 0%;
+}
+
+.lobby-overlay-room-list, .lobby-overlay-cur-room {
+    width: 50%;
+    height: 100%;
+    
+    display: inline-block;
+    
+    background-color: #aaa;
+    border: 1px solid white;
+    box-sizing: border-box;
+}
+
+.lobby-overlay-room-list {
+    left: 0%;
+    top: 0%;
+}
+
+.lobby-overlay-cur-room {
+    left: 50%;
+    top: 0%;
+}
+
+.loading-overlay {
+    font-size: 5px;
+    border-top: 1em solid #555;
+    border-right: 1em solid #555;
+    border-bottom: 1em solid #555;
+    border-left: 1em solid #fff;
+    -webkit-animation: loadcircle 1s infinite linear;
+    animation: loadcircle 1s infinite linear;
+    box-sizing: border-box;
+
+    bottom: 10px;
+    right: 10px;
+}
+.loading-overlay,
+.loading-overlay:after {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+}
+@-webkit-keyframes loadcircle {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes loadcircle {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}

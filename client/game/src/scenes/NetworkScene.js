@@ -5,15 +5,6 @@ var Scene = wfl.display.Scene;
 
 var NetworkScene = function (canvas, roomId) {
     Scene.call(this, canvas);
-    
-    $(Network).on(
-        Network.Event.ADD_CLIENT,
-        this.onAddClient.bind(this)
-    );
-    $(Network).on(
-        Network.Event.REMOVE_CLIENT,
-        this.onRemoveClient.bind(this)
-    );
 
     // Add other clients that are already connected
     var room = Network.rooms[roomId];

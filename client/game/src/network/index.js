@@ -8,8 +8,6 @@ var Network = {
     connected   : false,
     Event       : {
         CONNECT            : "connect",
-        REMOVE_CLIENT      : "removeClient",
-        ADD_CLIENT         : "addClient",
         UPDATE_ROOMS       : "updateRooms",
         ENTER_ROOM_SUCCESS : "enterRoomSuccess",
         ENTER_ROOM_FAIL    : "enterRoomFail"
@@ -45,12 +43,16 @@ var Network = {
         this.socket.emit('createRoom', roomData);
     },
 
-    enterRoom : function (room) {
-        this.socket.emit('enterRoom', room.id);
+    enterRoom : function (roomId) {
+        this.socket.emit('enterRoom', roomId);
     },
 
-    leaveRoom : function (room) {
-        this.socket.emit('leaveRoom', room.id);
+    leaveRoom : function (roomId) {
+        this.socket.emit('leaveRoom', roomId);
+    },
+    
+    switchTeam : function (roomId) {
+        this.socket.emit('switchTeam', roomId);
     },
 
     _onConfirmClient : function (data) {
@@ -74,19 +76,9 @@ var Network = {
         this.clients[data.id] = newClient;
 
         this._onUpdateClient(data);
-
-        $(this).trigger(
-            this.Event.ADD_CLIENT,
-            this.clients[data.id]
-        );
     },
 
     _onRemoveOtherClient : function (data) {
-        $(this).trigger(
-            this.Event.REMOVE_CLIENT,
-            this.clients[data.id]
-        );
-
         this.clients[data.id] = undefined;
         delete this.clients[data.id];
     },

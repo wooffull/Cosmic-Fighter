@@ -22,7 +22,8 @@ var configureSockets = function (socketio) {
                 velocity     : { x : 0, y : 0 },
                 acceleration : { x : 0, y : 0 },
                 rotation     : -Math.PI * 0.5,
-                roomId       : undefined
+                roomId       : undefined,
+                team         : undefined
             };
             clients[clientCounter] = client;
 
@@ -54,7 +55,7 @@ var configureSockets = function (socketio) {
         });
 
         socket.on('updateOther', function (data) {
-            if (clients[id]) {
+            if (clients[id] && clients[id].roomId !== undefined) {
                 var updateData = {
                     id           : id,
                     position     : data.position,
@@ -67,8 +68,8 @@ var configureSockets = function (socketio) {
                 clients[id].velocity     = data.velocity;
                 clients[id].acceleration = data.acceleration;
                 clients[id].rotation     = data.rotation;
-
-                socket.broadcast.emit('updateOther', updateData);
+                
+                socket.broadcast.to("room" + clients[id].roomId).emit('updateOther', updateData);
             }
         });
 
@@ -81,6 +82,8 @@ var configureSockets = function (socketio) {
             room.name = data.name;
             room.id = roomCounter;
             room.players = [];
+            room.teamA = [];
+            room.teamB = [];
 
             rooms[room.id] = room;
             roomCounter++;
@@ -92,24 +95,63 @@ var configureSockets = function (socketio) {
             }
         });
 
+        socket.on('switchTeam', function (roomId) {
+            var room = rooms[roomId];
+
+            // Remove player from their corresponding team's array and add to
+            // the other (if there's space on the other team)
+            if (clients[id].team === 0) {
+                if (room.teamB.length < 4) {
+                    var playerIndex = room.teamA.indexOf(id);
+                    room.teamA.splice(playerIndex, 1);
+                    room.teamB.push(id);
+                    clients[id].team = 1;
+                    io.sockets.in("room" + roomId).emit('updateRooms', rooms);
+                }
+            } else {
+                if (room.teamA.length < 4) {
+                    var playerIndex = room.teamB.indexOf(id);
+                    room.teamB.splice(playerIndex, 1);
+                    room.teamA.push(id);
+                    clients[id].team = 0;
+                    io.sockets.in("room" + roomId).emit('updateRooms', rooms);
+                }
+            }
+        });
+
         var onEnterRoom = function (roomId) {
             var room = rooms[roomId];
 
             // Only add the player if the room isn't filled
             if (room.players.length < 7) {
                 // Remove player from any room they're currently in
-                if (clients[id].roomId !== undefined && clients[id].roomId !== room.id) {
+                if (clients[id].roomId !== undefined && clients[id].roomId !== roomId) {
                     onLeaveRoom(clients[id].roomId);
                 }
 
                 // Only add the player if they're not already in the room
                 if (clients[id].roomId === undefined) {
-                    socket.join("room" + room.id);
+                    socket.join("room" + roomId);
 
                     room.players.push(id);
-                    clients[id].roomId = room.id;
+                    clients[id].roomId = roomId;
+
+                    // Add to team A if it's not filled
+                    if (room.teamA.length < 4) {
+                        clients[id].team = 0;
+                        room.teamA.push(id);
+
+                    // Add to team B if it's not filled
+                    } else {
+                        clients[id].team = 1;
+                        room.teamB.push(id);
+                    }
 
                     socket.emit('enterRoomSuccess', room);
+
+                    // Update the players in this room to let them know a new
+                    // player has joined it
+                    io.sockets.in("room" + roomId).emit('updateRooms', rooms);
                 }
             } else {
                 socket.emit('enterRoomFail', { msg: "The room is filled. You cannot enter" });
@@ -119,19 +161,34 @@ var configureSockets = function (socketio) {
         var onLeaveRoom = function (roomId) {
             var room = rooms[roomId];
 
-            socket.leave("room" + room.id);
-
             // Remove player's socket from the array
             var playerIndex = room.players.indexOf(id);
             room.players.splice(playerIndex, 1);
 
+            // Remove player from their corresponding team's array
+            if (clients[id].team === 0) {
+                var playerIndex = room.teamA.indexOf(id);
+                room.teamA.splice(playerIndex, 1);
+            } else {
+                var playerIndex = room.teamB.indexOf(id);
+                room.teamB.splice(playerIndex, 1);
+            }
+
             clients[id].roomId = undefined;
+            clients[id].team   = undefined;
 
             // Destroy the room if there are no players remaining in it
             if (room.players.length === 0) {
-                delete rooms[room.id];
+                delete rooms[roomId];
                 io.sockets.emit('updateRooms', rooms);
+
+            // Otherwise, only update the players in the room that someone
+            // has left
+            } else {
+                io.sockets.in("room" + roomId).emit('updateRooms', rooms);
             }
+
+            socket.leave("room" + roomId);
         };
 
         socket.on('enterRoom', onEnterRoom);

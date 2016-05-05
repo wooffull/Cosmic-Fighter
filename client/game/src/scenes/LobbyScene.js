@@ -4,7 +4,7 @@ var Scene = wfl.display.Scene;
 var overlays = require('../overlays');
 var Network = require('../network');
 
-var LoadingScene = function (canvas) {
+var LobbyScene = function (canvas) {
     Scene.call(this, canvas);
 
     this.curRoomId = undefined;
@@ -16,7 +16,9 @@ var LoadingScene = function (canvas) {
 
     this.createRoomOverlay.domObject.hide();
 
+    this.lobbyOverlay.leaveRoomBtn.click(this._onLeaveRoomButtonClick.bind(this));
     this.lobbyOverlay.playBtn.click(this._onPlayButtonClick.bind(this));
+    this.lobbyOverlay.switchTeamBtn.click(this._onSwitchTeamButtonClick.bind(this));
     this.lobbyOverlay.createRoomBtn.click(this._onCreateRoomButtonClick.bind(this));
 
     this.createRoomOverlay.cancelBtn.click(this._onCreateRoomCancel.bind(this));
@@ -29,18 +31,24 @@ var LoadingScene = function (canvas) {
     $(Network).on(Network.Event.ENTER_ROOM_FAIL, this._onEnterRoomFail.bind(this));
 
     this.roomUpdateInterval =
-        setInterval(this.updateRoomList.bind(this), LoadingScene.ROOM_UPDATE_FREQUENCY);
+        setInterval(this.updateRoomList.bind(this), LobbyScene.ROOM_UPDATE_FREQUENCY);
 
     this.updateRoomList();
 };
 
-Object.defineProperties(LoadingScene, {
+Object.defineProperties(LobbyScene, {
     ROOM_UPDATE_FREQUENCY : {
         value : 5000
+    },
+
+    Event : {
+        value : {
+            PLAY_GAME : "play-game"
+        }
     }
 });
 
-LoadingScene.prototype = Object.freeze(Object.create(Scene.prototype, {
+LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     destroy : {
         value : function () {
             this.lobbyOverlay.domObject.remove();
@@ -57,9 +65,16 @@ LoadingScene.prototype = Object.freeze(Object.create(Scene.prototype, {
         }
     },
 
+    _onLeaveRoomButtonClick : {
+        value : function (e) {
+            Network.leaveRoom(this.curRoomId);
+            this.curRoomId = undefined;
+        }
+    },
+
     _onPlayButtonClick : {
         value : function (e) {
-            $(this).trigger("play-game", this.curRoomId);
+            $(this).trigger(LobbyScene.Event.PLAY_GAME, this.curRoomId);
         }
     },
 
@@ -93,9 +108,18 @@ LoadingScene.prototype = Object.freeze(Object.create(Scene.prototype, {
 
     _onCreateRoom : {
         value : function (e) {
-            this.createRoomOverlay.domObject.hide();
             var name = this.createRoomOverlay.inputField.val();
-            Network.createRoom(name);
+
+            if (name !== "") {
+                this.createRoomOverlay.domObject.hide();
+                Network.createRoom(name);
+            }
+        }
+    },
+    
+    _onSwitchTeamButtonClick : {
+        value : function (e) {
+            Network.switchTeam(this.curRoomId);
         }
     },
 
@@ -105,13 +129,15 @@ LoadingScene.prototype = Object.freeze(Object.create(Scene.prototype, {
 
             if (this.curRoomId !== undefined) {
                 this.lobbyOverlay.renderRoom(data[this.curRoomId]);
+            } else {
+                this.lobbyOverlay.renderRoom();
             }
         }
     },
 
     _onEnterRoomAttempt : {
         value : function (e, data) {
-            Network.enterRoom(data);
+            Network.enterRoom(data.id);
         }
     },
 
@@ -131,6 +157,6 @@ LoadingScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     }
 }));
 
-Object.freeze(LoadingScene);
+Object.freeze(LobbyScene);
 
-module.exports = LoadingScene;
+module.exports = LobbyScene;

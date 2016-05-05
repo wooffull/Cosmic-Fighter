@@ -9,13 +9,14 @@ var LobbyOverlay = function () {
     // Set up left side
     this.leftContainer = $("<span>");
     this.leftContainer.addClass("lobby-overlay-left");
+    this.leftContainer.addClass("lobby-overlay-maximized-side");
 
     this.roomButtonContainer = $("<div>");
     this.roomButtonContainer.addClass("lobby-overlay-button-container");
     this.leftContainer.append(this.roomButtonContainer);
 
     this.selectRoomLabel = $("<div>");
-    this.selectRoomLabel.html("Select or create a room");
+    this.selectRoomLabel.html("Select or create room");
     this.roomButtonContainer.append(this.selectRoomLabel);
     this.roomButtonContainer.append($("<br>"));
 
@@ -31,18 +32,40 @@ var LobbyOverlay = function () {
     // Set up right side
     this.rightContainer = $("<span>");
     this.rightContainer.addClass("lobby-overlay-right");
+    this.rightContainer.addClass("lobby-overlay-minimized-side");
 
     this.selectedRoomLabel = $("<div>");
+    this.selectedRoomLabel.addClass("lobby-overlay-room-label-container");
+    
     this.renderRoomLabel();
     this.rightContainer.append(this.selectedRoomLabel);
 
-    this.playerList = $("<div>");
+    this.switchTeamBtn = $("<button>");
+    this.switchTeamBtn.text("Switch Teams");
+    this.switchTeamBtn.addClass("lobby-overlay-switch-team-btn");
+
+    this.teamAContainer = $("<div>");
+    this.teamAContainer.addClass("lobby-overlay-teamA-container");
+    
+    this.teamBContainer = $("<div>");
+    this.teamBContainer.addClass("lobby-overlay-teamB-container");
+    
     this.renderPlayers();
-    this.rightContainer.append(this.playerList);
+
+    this.rightContainer.append(this.teamAContainer);
+    this.rightContainer.append(this.switchTeamBtn);
+    this.rightContainer.append(this.teamBContainer);
+
+    this.leaveRoomBtn = $("<button>");
+    this.leaveRoomBtn.text("Leave Room");
+    this.leaveRoomBtn.addClass("lobby-overlay-leave-room-btn");
+    this.leaveRoomBtn.hide();
+    this.rightContainer.append(this.leaveRoomBtn);
 
     this.playBtn = $("<button>");
     this.playBtn.text("Play");
     this.playBtn.addClass("lobby-overlay-play-btn");
+    this.playBtn.hide();
     this.rightContainer.append(this.playBtn);
 
     this.domObject.append(this.leftContainer);
@@ -94,9 +117,13 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
             if (data === undefined) {
                 this.renderRoomLabel();
                 this.renderPlayers();
+
+                this._onExitRoom();
             } else {
                 this.renderRoomLabel(data.name);
-                this.renderPlayers(data.players);
+                this.renderPlayers(data);
+
+                this._onEnterRoom();
             }
         }
     },
@@ -114,18 +141,60 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
     },
 
     renderPlayers : {
-        value : function (playerIds) {
-            this.playerList.html("");
+        value : function (roomData) {
+            this.teamAContainer.html("");
+            this.teamBContainer.html("");
+            this.switchTeamBtn.hide();
 
-            if (playerIds !== undefined) {
-                for (var i = 0; i < playerIds.length; i++) {
-                    var curId = playerIds[i];
-                    var curPlayer = Network.clients[curId];
-                    console.log(curPlayer);
+            if (roomData !== undefined) {
+                var teamA = roomData.teamA;
+                var teamB = roomData.teamB;
+                
+                var teamALabel = $("<div>");
+                teamALabel.html("Rose Team");
+                teamALabel.addClass("lobby-overlay-team-label");
+                this.teamAContainer.append(teamALabel);
+                
+                var teamBLabel = $("<div>");
+                teamBLabel.html("Sky Team");
+                teamBLabel.addClass("lobby-overlay-team-label");
+                this.teamBContainer.append(teamBLabel);
+
+                // Add team A players
+                for (var i = 0; i < 4; i++) {
+                    var label;
                     var playerContainer = $("<div>");
-                    playerContainer.html(curPlayer.data.user);
-                    this.playerList.append(playerContainer);
+                    
+                    if (i < teamA.length) {
+                        var curId = teamA[i];
+                        var curPlayer = Network.clients[curId];
+                        label = curPlayer.data.user;
+                    } else {
+                        label = "------";
+                    }
+                    
+                    playerContainer.html(label);
+                    this.teamAContainer.append(playerContainer);
                 }
+
+                // Add team B players
+                for (var i = 0; i < 4; i++) {
+                    var label;
+                    var playerContainer = $("<div>");
+                    
+                    if (i < teamB.length) {
+                        var curId = teamB[i];
+                        var curPlayer = Network.clients[curId];
+                        label = curPlayer.data.user;
+                    } else {
+                        label = "------";
+                    }
+                    
+                    playerContainer.html(label);
+                    this.teamBContainer.append(playerContainer);
+                }
+
+                this.switchTeamBtn.show();
             }
         }
     },
@@ -139,6 +208,32 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
             };
 
             $(this).trigger(LobbyOverlay.Event.ENTER_ROOM, room);
+        }
+    },
+
+    _onExitRoom : {
+        value : function () {
+            this.leaveRoomBtn.hide();
+            this.playBtn.hide();
+
+            this.leftContainer.removeClass("lobby-overlay-minimized-side");
+            this.rightContainer.removeClass("lobby-overlay-maximized-side");
+
+            this.leftContainer.addClass("lobby-overlay-maximized-side");
+            this.rightContainer.addClass("lobby-overlay-minimized-side");
+        }
+    },
+
+    _onEnterRoom : {
+        value : function () {
+            this.leaveRoomBtn.show();
+            this.playBtn.show();
+
+            this.leftContainer.removeClass("lobby-overlay-maximized-side");
+            this.rightContainer.removeClass("lobby-overlay-minimized-side");
+
+            this.leftContainer.addClass("lobby-overlay-minimized-side");
+            this.rightContainer.addClass("lobby-overlay-maximized-side");
         }
     }
 }));

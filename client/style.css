@@ -98,6 +98,10 @@ a:hover {
     color: #fff;
 }
 
+button:hover  {
+    cursor: pointer;
+}
+
 #game-canvas {
     display: block;
     margin: auto;
@@ -160,13 +164,21 @@ a:hover {
 }
 
 .lobby-overlay-left {
-    width: 40%;
     left: 0%;
+    
+    border-right: 2px solid #808080;
 }
 
 .lobby-overlay-right {
-    width: 60%;
     left: 50%;
+}
+
+.lobby-overlay-maximized-side {
+    width: 65%;
+}
+
+.lobby-overlay-minimized-side {
+    width: 35%;
 }
 
 .lobby-overlay-button-container, .lobby-overlay-room-list {
@@ -183,14 +195,6 @@ a:hover {
     height: 80%;
 }
 
-.lobby-overlay-button-container-min {
-    height: 0%;
-}
-
-.lobby-overlay-room-list-max {
-    height: 100%;
-}
-
 .lobby-overlay-room {
     transition: background-color 0.1s;
     margin: 0.25em 0;
@@ -201,12 +205,48 @@ a:hover {
     cursor: pointer;
 }
 
+.lobby-overlay-room-label-container {
+    margin-bottom: 1em;
+}
+
 .lobby-overlay-play-btn {
     bottom: 0%;
     right: 0%;
 
     position: absolute;
     margin: 1em;
+}
+
+.lobby-overlay-teamA-container,.lobby-overlay-teamB-container {
+    display: inline-block;
+    height: 30%;
+    width: 100%;
+}
+
+.lobby-overlay-teamA-container {
+    color: #E491FF;
+}
+
+.lobby-overlay-teamB-container {
+    color: #86c8d3;
+}
+
+.lobby-overlay-team-label {
+    font-size: 24px;
+    margin-bottom: 1em;
+}
+
+.lobby-overlay-switch-team-btn {
+    display: block;
+    margin: 1em auto;
+}
+
+.lobby-overlay-leave-room-btn {
+    display: block;
+    bottom: 0%;
+    
+    position: absolute;
+    margin-bottom: 1em;
 }
 
 /**

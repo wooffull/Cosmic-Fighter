@@ -36,7 +36,7 @@ var LobbyOverlay = function () {
 
     this.selectedRoomLabel = $("<div>");
     this.selectedRoomLabel.addClass("lobby-overlay-room-label-container");
-    
+
     this.renderRoomLabel();
     this.rightContainer.append(this.selectedRoomLabel);
 
@@ -46,10 +46,10 @@ var LobbyOverlay = function () {
 
     this.teamAContainer = $("<div>");
     this.teamAContainer.addClass("lobby-overlay-teamA-container");
-    
+
     this.teamBContainer = $("<div>");
     this.teamBContainer.addClass("lobby-overlay-teamB-container");
-    
+
     this.renderPlayers();
 
     this.rightContainer.append(this.teamAContainer);
@@ -62,11 +62,11 @@ var LobbyOverlay = function () {
     this.leaveRoomBtn.hide();
     this.rightContainer.append(this.leaveRoomBtn);
 
-    this.playBtn = $("<button>");
-    this.playBtn.text("Play");
-    this.playBtn.addClass("lobby-overlay-play-btn");
-    this.playBtn.hide();
-    this.rightContainer.append(this.playBtn);
+    this.readyBtn = $("<button>");
+    this.readyBtn.text("Ready");
+    this.readyBtn.addClass("lobby-overlay-ready-btn");
+    this.readyBtn.hide();
+    this.rightContainer.append(this.readyBtn);
 
     this.domObject.append(this.leftContainer);
     this.domObject.append(this.rightContainer);
@@ -149,49 +149,93 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
             if (roomData !== undefined) {
                 var teamA = roomData.teamA;
                 var teamB = roomData.teamB;
-                
+
                 var teamALabel = $("<div>");
                 teamALabel.html("Rose Team");
                 teamALabel.addClass("lobby-overlay-team-label");
                 this.teamAContainer.append(teamALabel);
-                
+
                 var teamBLabel = $("<div>");
                 teamBLabel.html("Sky Team");
                 teamBLabel.addClass("lobby-overlay-team-label");
                 this.teamBContainer.append(teamBLabel);
 
+                var localId = Network.localClient.id;
+
                 // Add team A players
                 for (var i = 0; i < 4; i++) {
                     var label;
                     var playerContainer = $("<div>");
-                    
+                    var ready = false;
+
                     if (i < teamA.length) {
                         var curId = teamA[i];
                         var curPlayer = Network.clients[curId];
+                        ready = curPlayer.data.ready;
                         label = curPlayer.data.user;
+
+                        if (curId === localId) {
+                            playerContainer.addClass("lobby-overlay-local-player-container");
+
+                            if (!ready) {
+                                this.readyBtn.html("Ready");
+                                this.switchTeamBtn.prop("disabled", false);
+                            } else {
+                                this.readyBtn.html("Cancel");
+                                this.switchTeamBtn.prop("disabled", true);
+                            }
+                        }
                     } else {
                         label = "------";
                     }
-                    
+
                     playerContainer.html(label);
                     this.teamAContainer.append(playerContainer);
+
+                    if (ready) {
+                        var readyContainer = $("<span>");
+                        readyContainer.html("Ready");
+                        readyContainer.addClass("lobby-overlay-ready-container");
+                        playerContainer.append(readyContainer);
+                    }
                 }
 
                 // Add team B players
                 for (var i = 0; i < 4; i++) {
                     var label;
                     var playerContainer = $("<div>");
-                    
+                    var ready = false;
+
                     if (i < teamB.length) {
                         var curId = teamB[i];
                         var curPlayer = Network.clients[curId];
+                        ready = curPlayer.data.ready;
                         label = curPlayer.data.user;
+
+                        if (curId === localId) {
+                            playerContainer.addClass("lobby-overlay-local-player-container");
+
+                            if (!ready) {
+                                this.readyBtn.html("Ready");
+                                this.switchTeamBtn.prop("disabled", false);
+                            } else {
+                                this.readyBtn.html("Cancel");
+                                this.switchTeamBtn.prop("disabled", true);
+                            }
+                        }
                     } else {
                         label = "------";
                     }
-                    
+
                     playerContainer.html(label);
                     this.teamBContainer.append(playerContainer);
+
+                    if (ready) {
+                        var readyContainer = $("<span>");
+                        readyContainer.html("Ready");
+                        readyContainer.addClass("lobby-overlay-ready-container");
+                        playerContainer.append(readyContainer);
+                    }
                 }
 
                 this.switchTeamBtn.show();
@@ -214,7 +258,7 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
     _onExitRoom : {
         value : function () {
             this.leaveRoomBtn.hide();
-            this.playBtn.hide();
+            this.readyBtn.hide();
 
             this.leftContainer.removeClass("lobby-overlay-minimized-side");
             this.rightContainer.removeClass("lobby-overlay-maximized-side");
@@ -227,7 +271,7 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
     _onEnterRoom : {
         value : function () {
             this.leaveRoomBtn.show();
-            this.playBtn.show();
+            this.readyBtn.show();
 
             this.leftContainer.removeClass("lobby-overlay-maximized-side");
             this.rightContainer.removeClass("lobby-overlay-minimized-side");

@@ -17,7 +17,6 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 var messageObj = JSON.parse(xhr.responseText);
-
                 handleError(messageObj.error);
             }
         });

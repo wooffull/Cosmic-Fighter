@@ -209,7 +209,7 @@ button:hover  {
     margin-bottom: 1em;
 }
 
-.lobby-overlay-play-btn {
+.lobby-overlay-ready-btn {
     bottom: 0%;
     right: 0%;
 
@@ -229,6 +229,17 @@ button:hover  {
 
 .lobby-overlay-teamB-container {
     color: #86c8d3;
+}
+
+.lobby-overlay-local-player-container {
+}
+
+.lobby-overlay-local-player-container:before {
+    content: "* ";
+}
+
+.lobby-overlay-ready-container {
+    float: right;
 }
 
 .lobby-overlay-team-label {

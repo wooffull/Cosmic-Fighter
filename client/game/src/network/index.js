@@ -6,11 +6,16 @@ var Network = {
     clients     : {},
     rooms       : {},
     connected   : false,
+    hostId      : -1,
+
+    // Events for external entities to subscribe to
     Event       : {
         CONNECT            : "connect",
         UPDATE_ROOMS       : "updateRooms",
         ENTER_ROOM_SUCCESS : "enterRoomSuccess",
-        ENTER_ROOM_FAIL    : "enterRoomFail"
+        ENTER_ROOM_FAIL    : "enterRoomFail",
+        PLAY               : "play",
+        START_GAME         : "startGame"
     },
 
     init : function () {
@@ -24,6 +29,9 @@ var Network = {
         this.socket.on('updateRooms', this._onUpdateRooms.bind(this));
         this.socket.on('enterRoomSuccess', this._onEnterRoomSuccess.bind(this));
         this.socket.on('enterRoomFail', this._onEnterRoomFail.bind(this));
+        this.socket.on('ping', this._onPing.bind(this));
+        this.socket.on('setHost', this._onSetHost.bind(this));
+        this.socket.on('startGame', this._onStartGame.bind(this));
 
         this.socket.emit('init', {
             user : $("#userName").html()
@@ -50,7 +58,7 @@ var Network = {
     leaveRoom : function (roomId) {
         this.socket.emit('leaveRoom', roomId);
     },
-    
+
     switchTeam : function (roomId) {
         this.socket.emit('switchTeam', roomId);
     },
@@ -127,6 +135,25 @@ var Network = {
     _onEnterRoomFail : function (data) {
         $(this).trigger(
             this.Event.ENTER_ROOM_FAIL,
+            data
+        );
+    },
+
+    _onPing : function (pingObj) {
+        if (pingObj) {
+            this.socket.emit('returnPing', pingObj);
+        }
+    },
+
+    _onSetHost : function (data) {
+        this.hostId = data.id;
+        console.log(data);
+    },
+
+    _onStartGame : function (data) {
+    console.log("DSTST");
+        $(this).trigger(
+            this.Event.START_GAME,
             data
         );
     }

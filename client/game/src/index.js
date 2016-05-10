@@ -30,15 +30,18 @@ var onNetworkConnect = function () {
     var lobbyScene = new scenes.LobbyScene(canvas);
     game.setScene(lobbyScene);
 
-    $(lobbyScene).on(scenes.LobbyScene.Event.PLAY_GAME, onPlayGame);
+    $(Network).on(
+        Network.Event.START_GAME,
+        onPlayGame
+    );
 };
 
-var onPlayGame = function (e, roomId) {
+var onPlayGame = function (e, room) {
     $(game.getScene()).off();
 
-    var gameScene = new scenes.GameScene(canvas, roomId);
+    var gameScene = new scenes.GameScene(canvas, room.id);
     game.setScene(gameScene);
-    
+
     // Start the game since it was stopped to help performance with overlays on
     // a canvas
     game.start();

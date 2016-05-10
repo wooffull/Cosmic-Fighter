@@ -17,7 +17,7 @@ var LobbyScene = function (canvas) {
     this.createRoomOverlay.domObject.hide();
 
     this.lobbyOverlay.leaveRoomBtn.click(this._onLeaveRoomButtonClick.bind(this));
-    this.lobbyOverlay.playBtn.click(this._onPlayButtonClick.bind(this));
+    this.lobbyOverlay.readyBtn.click(this._onReadyButtonClick.bind(this));
     this.lobbyOverlay.switchTeamBtn.click(this._onSwitchTeamButtonClick.bind(this));
     this.lobbyOverlay.createRoomBtn.click(this._onCreateRoomButtonClick.bind(this));
 
@@ -43,7 +43,7 @@ Object.defineProperties(LobbyScene, {
 
     Event : {
         value : {
-            PLAY_GAME : "play-game"
+            TOGGLE_READY : "toggleReady"
         }
     }
 });
@@ -72,9 +72,15 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
         }
     },
 
-    _onPlayButtonClick : {
+    _onReadyButtonClick : {
         value : function (e) {
-            $(this).trigger(LobbyScene.Event.PLAY_GAME, this.curRoomId);
+            var clientWillBeReady = !Network.localClient.data.ready;
+        
+            this.lobbyOverlay.switchTeamBtn.prop("disabled", clientWillBeReady);
+        
+            Network.socket.emit('updateReady', {
+                ready : clientWillBeReady
+            });
         }
     },
 

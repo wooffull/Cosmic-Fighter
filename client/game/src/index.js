@@ -31,29 +31,66 @@ var onLoad = function () {
     Network.init();
 };
 
-var onNetworkConnect = function () {
+var goToGame = function (room) {
+    // Update the game with the current time because the dt will be huge next
+    // update since the game was stopped while in the lobby
+    game.update(Date.now());
+
+    $(game.getScene()).off();
+
+    var gameScene = new scenes.GameScene(canvas, room);
+    game.setScene(gameScene);
+
+    $(Network).on(
+        Network.Event.CLOCK_TICK,
+        gameScene.onClockTick.bind(gameScene)
+    );
+
+    $(Network).on(
+        Network.Event.END_GAME,
+        onEndGame
+    );
+
+    // Start the game since it was stopped to help performance with overlays on
+    // a canvas
+    game.start();
+};
+
+var goToLobby = function () {
+    // Stop the game so that canvas updates don't affect performance with
+    // overlays
+    game.stop();
+
+    // Reset all listeners on the Network
+    $(Network).off();
+
     var lobbyScene = new scenes.LobbyScene(canvas);
     game.setScene(lobbyScene);
 
     $(Network).on(
         Network.Event.START_GAME,
-        onPlayGame
+        onStartGame
     );
-    
+
     // Transition the page's BG color to black to hide the BG image which
     // becomes distracting during game play
     $("body").css({"background-color": "#071213"});
 };
 
-var onPlayGame = function (e, room) {
-    $(game.getScene()).off();
+var onStartGame = function (e, room) {
+    goToGame(room);
+};
 
-    var gameScene = new scenes.GameScene(canvas, room.id);
-    game.setScene(gameScene);
+var onEndGame = function (e, room) {
+    goToLobby();
 
-    // Start the game since it was stopped to help performance with overlays on
-    // a canvas
-    game.start();
+    // Trigger an event so the lobby scene knows to join the room it was just
+    // in before playing the game
+    Network._onEnterRoomSuccess(room);
+};
+
+var onNetworkConnect = function () {
+    goToLobby();
 };
 
 var Preloader = new util.Preloader(onLoad.bind(this));

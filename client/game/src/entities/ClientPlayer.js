@@ -7,11 +7,20 @@ var GameObject = wfl.core.entities.GameObject;
 var LivingObject = wfl.core.entities.LivingObject;
 var geom = wfl.geom;
 
-var ClientPlayer = function () {
+var ClientPlayer = function (team) {
     LivingObject.call(this);
 
+    this.customData.team = team;
+
+    var shipType;
+    if (team === 0) {
+        shipType = Assets.SHIP_1;
+    } else {
+        shipType = Assets.SHIP_2;
+    }
+
     // Create default state
-    this.defaultGraphic = Assets.get(Assets.CLIENT);
+    this.defaultGraphic = Assets.get(shipType);
 
     var w = this.defaultGraphic.width;
     var h = this.defaultGraphic.height;
@@ -58,6 +67,12 @@ ClientPlayer.prototype = Object.freeze(Object.create(LivingObject.prototype, {
             ctx.fillRect(offsetX, offsetY, displayWidth, displayHeight);
 
             ctx.restore();
+        }
+    },
+
+    resolveCollision : {
+        value : function (physObj, collisionData) {
+            Player.prototype.resolveCollision.call(this, physObj, collisionData);
         }
     }
 }));

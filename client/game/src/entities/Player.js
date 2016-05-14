@@ -7,13 +7,22 @@ var GameObject = wfl.core.entities.GameObject;
 var LivingObject = wfl.core.entities.LivingObject;
 var geom = wfl.geom;
 
-var Player = function () {
+var Player = function (team) {
     LivingObject.call(this);
 
     this.solid = true;
 
+    this.customData.team = team;
+
+    var shipType;
+    if (team === 0) {
+        shipType = Assets.SHIP_1;
+    } else {
+        shipType = Assets.SHIP_2;
+    }
+
     // Create default state
-    this.defaultGraphic = Assets.get(Assets.PLAYER);
+    this.defaultGraphic = Assets.get(shipType);
 
     var w = this.defaultGraphic.width;
     var h = this.defaultGraphic.height;
@@ -29,7 +38,8 @@ var Player = function () {
     this.defaultState.addFrame(frameObj);
     this.addState(GameObject.STATE.DEFAULT, this.defaultState);
 
-    this.lastSentPosition = new geom.Vec2(-Infinity, -Infinity);
+    this.shootTimer = 0;
+    this.maxShootTimer = Player.DEFAULT_MAX_SHOOT_TIMER;
 
     this.rotate(-Math.PI * 0.5);
 };
@@ -52,13 +62,26 @@ Object.defineProperties(Player, {
 
     MINIMAP_FILL_STYLE : {
         value : "#86c8d3"
+    },
+
+    DEFAULT_MAX_SHOOT_TIMER : {
+        value : 20
     }
 });
 Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
     update : {
         value : function (dt) {
             LivingObject.prototype.update.call(this, dt);
-            
+
+            // Update shoot timer when just shot
+            if (this.justShot()) {
+                this.shootTimer++;
+
+                if (this.shootTimer >= this.maxShootTimer) {
+                    this.shootTimer = 0;
+                }
+            }
+
             // If the player is connected to the network, send out updates to
             // other players when necessary
             if (Network.connected) {
@@ -87,6 +110,41 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
             ctx.fillRect(offsetX, offsetY, displayWidth, displayHeight);
 
             ctx.restore();
+        }
+    },
+
+    shoot : {
+        value : function () {
+            if (!this.justShot()) {
+                this.shootTimer = 1;
+
+                if (Network.connected) {
+                    Network.socket.emit('bullet', {
+                        position     : this.position,
+                        velocity     : this.velocity,
+                        acceleration : this.acceleration,
+                        rotation     : this.getRotation()
+                    });
+                }
+            }
+        }
+    },
+
+    justShot : {
+        value : function () {
+            return (this.shootTimer > 0);
+        }
+    },
+
+    resolveCollision : {
+        value : function (physObj, collisionData) {
+            var team = this.customData.team;
+            var otherTeam = physObj.customData.team;
+        
+            // If hitting something that's not on this team
+            if (otherTeam === undefined || otherTeam !== team || physObj.takeDamage) {
+                LivingObject.prototype.resolveCollision.call(this, physObj, collisionData);
+            }
         }
     }
 }));

@@ -10,8 +10,10 @@ var NetworkScene = require('./NetworkScene');
 var backgrounds = wfl.display.backgrounds;
 var geom = wfl.geom;
 
-var GameScene = function (canvas, roomId) {
-    NetworkScene.call(this, canvas, roomId);
+var GameScene = function (canvas, room) {
+    NetworkScene.call(this, canvas, room);
+
+    this.timeRemaining = room.timeRemaining;
 
     var wallSize = 10;
     var blockSize = 128;
@@ -52,12 +54,13 @@ var GameScene = function (canvas, roomId) {
 
         this.addGameObject(newBlock);
     }
-    
+
     this.bg = new backgrounds.ParallaxBackground(
         Assets.get(Assets.BG_TILE)
     );
-    
-    this.player = Network.localClient.gameObject;
+
+    this.player = new Player(Network.localClient.data.team);
+    Network.localClient.gameObject = this.player;
     this.addGameObject(this.player, 2);
 };
 Object.defineProperties(GameScene, {
@@ -75,22 +78,97 @@ Object.defineProperties(GameScene, {
     }
 });
 GameScene.prototype = Object.freeze(Object.create(NetworkScene.prototype, {
+    /**
+     * Updates the scene and all game objects in it
+     */
     update : {
         value : function (dt) {
+            this.timeRemaining -= dt;
+console.log(dt);
+            // Apply friction
             var gameObjects = this.getGameObjects();
-        
             for (var i = 0; i < gameObjects.length; i++) {
                 var obj = gameObjects[i];
-                obj.acceleration.multiply(GameScene.FRICTION);
-                obj.velocity.multiply(GameScene.FRICTION);
+                if (!obj.customData.ignoreFriction) {
+                    obj.acceleration.multiply(GameScene.FRICTION);
+                    obj.velocity.multiply(GameScene.FRICTION);
+                }
             }
-            
+
             NetworkScene.prototype.update.call(this, dt);
-            
+
             this.handleInput();
+
+            // Go through all game objects and remove any that have been
+            // flagged for removal
+            gameObjects = this.getGameObjects(); // Get again in case of changes
+            for (var i = gameObjects.length - 1; i >= 0; i--) {
+                var obj = gameObjects[i];
+
+                if (obj.customData.removed === true) {
+                    this.removeGameObject(obj);
+                }
+            }
+
+            if (Network.isHost()) {
+                this.sendHostData();
+            }
         }
     },
-    
+
+    sendHostData : {
+        value : function () {
+            if (Network.connected) {
+                Network.socket.emit('clockTick', {
+                    timeRemaining : this.timeRemaining
+                });
+            }
+        }
+    },
+
+    /**
+     * Draws the scene and all game objects in it
+     */
+    draw : {
+        value : function (ctx) {
+            NetworkScene.prototype.draw.call(this, ctx);
+
+            ctx.save();
+
+            var screenWidth  = ctx.canvas.width;
+            var screenHeight = ctx.canvas.height;
+            var offset       = new geom.Vec2(
+                screenWidth  * 0.5,
+                screenHeight * 0.5
+            );
+
+            var timeText;
+
+            if (this.timeRemaining > 0) {
+                var minutes = Math.floor(this.timeRemaining / (1000 * 60));
+                var seconds = Math.floor((this.timeRemaining - minutes * 1000 * 60) / 1000);
+                timeText = minutes + ":";
+
+                if (seconds < 10) {
+                    timeText += "0";
+                }
+
+                timeText += seconds;
+            } else {
+                timeText = "0:00";
+            }
+
+            ctx.translate(offset.x, 0);
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.font = "24px Munro";
+            ctx.textBaseline = "top";
+            ctx.fillText(timeText, 0, 0);
+
+            ctx.restore();
+        }
+    },
+
     handleInput : {
         value : function () {
             var player       = this.player;
@@ -99,6 +177,7 @@ GameScene.prototype = Object.freeze(Object.create(NetworkScene.prototype, {
             var rightPressed = keyboard.isPressed(keyboard.RIGHT);
             var upPressed    = keyboard.isPressed(keyboard.UP);
             var downPressed  = keyboard.isPressed(keyboard.DOWN);
+            var shooting     = keyboard.isPressed(keyboard.Z);
 
             // Left/ Right Key -- Player turns
             if (leftPressed || rightPressed) {
@@ -129,6 +208,16 @@ GameScene.prototype = Object.freeze(Object.create(NetworkScene.prototype, {
             if (downPressed) {
                 player.velocity.multiply(Player.BRAKE_RATE);
             }
+
+            if (shooting) {
+                player.shoot();
+            }
+        }
+    },
+
+    onClockTick : {
+        value : function (e, data) {
+            this.timeRemaining = data.timeRemaining;
         }
     }
 }));

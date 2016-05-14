@@ -1,6 +1,6 @@
 "use strict";
 
-var Overlay = require('./Overlay');
+var Overlay = require('./Overlay.js');
 
 var CreateRoomOverlay = function () {
     Overlay.call(this);

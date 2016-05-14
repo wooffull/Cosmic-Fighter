@@ -15,7 +15,10 @@ var Network = {
         ENTER_ROOM_SUCCESS : "enterRoomSuccess",
         ENTER_ROOM_FAIL    : "enterRoomFail",
         PLAY               : "play",
-        START_GAME         : "startGame"
+        START_GAME         : "startGame",
+        END_GAME           : "endGame",
+        BULLET             : "bullet",
+        CLOCK_TICK         : "clockTick"
     },
 
     init : function () {
@@ -32,6 +35,9 @@ var Network = {
         this.socket.on('ping', this._onPing.bind(this));
         this.socket.on('setHost', this._onSetHost.bind(this));
         this.socket.on('startGame', this._onStartGame.bind(this));
+        this.socket.on('endGame', this._onEndGame.bind(this));
+        this.socket.on('bullet', this._onBullet.bind(this));
+        this.socket.on('clockTick', this._onClockTick.bind(this));
 
         this.socket.emit('init', {
             user : $("#userName").html()
@@ -63,12 +69,14 @@ var Network = {
         this.socket.emit('switchTeam', roomId);
     },
 
+    isHost : function () {
+        return this.hostId === this.localClient.id;
+    },
+
     _onConfirmClient : function (data) {
         var id = data.id;
         this.localClient = new LocalClient(id, data);
         this.clients[id] = this.localClient;
-
-        this._onUpdateClient(data);
 
         this.connected = true;
 
@@ -82,8 +90,6 @@ var Network = {
         var newClient = new Client(id, data);
 
         this.clients[data.id] = newClient;
-
-        this._onUpdateClient(data);
     },
 
     _onRemoveOtherClient : function (data) {
@@ -107,13 +113,16 @@ var Network = {
         var client = this.clients[id];
 
         client.data = data;
-        client.gameObject.position.x = data.position.x;
-        client.gameObject.position.y = data.position.y;
-        client.gameObject.velocity.x = data.velocity.x;
-        client.gameObject.velocity.y = data.velocity.y;
-        client.gameObject.acceleration.x = data.acceleration.x;
-        client.gameObject.acceleration.y = data.acceleration.y;
-        client.gameObject.setRotation(data.rotation);
+
+        if (client.gameObject) {
+            client.gameObject.position.x = data.position.x;
+            client.gameObject.position.y = data.position.y;
+            client.gameObject.velocity.x = data.velocity.x;
+            client.gameObject.velocity.y = data.velocity.y;
+            client.gameObject.acceleration.x = data.acceleration.x;
+            client.gameObject.acceleration.y = data.acceleration.y;
+            client.gameObject.setRotation(data.rotation);
+        }
     },
 
     _onUpdateRooms : function (data) {
@@ -147,13 +156,40 @@ var Network = {
 
     _onSetHost : function (data) {
         this.hostId = data.id;
-        console.log(data);
     },
 
     _onStartGame : function (data) {
-    console.log("DSTST");
         $(this).trigger(
             this.Event.START_GAME,
+            data
+        );
+    },
+
+    _onEndGame : function (data) {
+        var room = this.rooms[data.id];
+
+        for (var i = 0; i < room.players.length; i++) {
+            this.clients[room.players[i]].data.ready = false;
+        }
+
+        this.localClient.data.ready = false;
+
+        $(this).trigger(
+            this.Event.END_GAME,
+            data
+        );
+    },
+
+    _onBullet : function (data) {
+        $(this).trigger(
+            this.Event.BULLET,
+            data
+        );
+    },
+
+    _onClockTick : function (data) {
+        $(this).trigger(
+            this.Event.CLOCK_TICK,
             data
         );
     }

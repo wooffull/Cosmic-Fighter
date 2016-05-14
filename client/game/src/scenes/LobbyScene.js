@@ -56,6 +56,8 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             this.createRoomOverlay.inputField.off("keypress");
             clearInterval(this.roomUpdateInterval);
             $(Network).off(Network.Event.UPDATE_ROOMS);
+            $(Network).off(Network.Event.ENTER_ROOM_SUCCESS);
+            $(Network).off(Network.Event.ENTER_ROOM_FAIL);
         }
     },
 
@@ -75,12 +77,13 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     _onReadyButtonClick : {
         value : function (e) {
             var clientWillBeReady = !Network.localClient.data.ready;
-        
+
             this.lobbyOverlay.switchTeamBtn.prop("disabled", clientWillBeReady);
-        
+
             Network.socket.emit('updateReady', {
                 ready : clientWillBeReady
             });
+            console.log("CLICKED READY BUTTON");
         }
     },
 
@@ -122,7 +125,7 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             }
         }
     },
-    
+
     _onSwitchTeamButtonClick : {
         value : function (e) {
             Network.switchTeam(this.curRoomId);

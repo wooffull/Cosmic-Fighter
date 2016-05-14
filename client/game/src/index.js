@@ -17,6 +17,11 @@ game.setScene(loadingScene);
 // overlays
 game.stop();
 
+// Draw initial black BG on canvas
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = "#040B0C";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 var onLoad = function () {
     $(Network).on(
         Network.Event.CONNECT,
@@ -34,6 +39,10 @@ var onNetworkConnect = function () {
         Network.Event.START_GAME,
         onPlayGame
     );
+    
+    // Transition the page's BG color to black to hide the BG image which
+    // becomes distracting during game play
+    $("body").css({"background-color": "#071213"});
 };
 
 var onPlayGame = function (e, room) {

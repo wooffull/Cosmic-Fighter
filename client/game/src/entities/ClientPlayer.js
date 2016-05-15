@@ -3,55 +3,24 @@
 var util = require('../util');
 var Assets = util.Assets;
 var Player = require('./Player');
-var GameObject = wfl.core.entities.GameObject;
 var LivingObject = wfl.core.entities.LivingObject;
 var geom = wfl.geom;
 
 var ClientPlayer = function (team) {
-    LivingObject.call(this);
-
-    this.customData.team = team;
-
-    var shipType;
-    if (team === 0) {
-        shipType = Assets.SHIP_1;
-    } else {
-        shipType = Assets.SHIP_2;
-    }
-
-    // Create default state
-    this.defaultGraphic = Assets.get(shipType);
-
-    var w = this.defaultGraphic.width;
-    var h = this.defaultGraphic.height;
-    var verts = [
-        new geom.Vec2(-w * 0.5, -h * 0.5),
-        new geom.Vec2(w * 0.5, 0),
-        new geom.Vec2(-w * 0.5, h * 0.5)
-    ];
-    var frameObj = this.createFrame(this.defaultGraphic, 1, false);
-    frameObj.vertices = verts;
-
-    this.defaultState = this.createState();
-    this.defaultState.addFrame(frameObj);
-    this.addState(GameObject.STATE.DEFAULT, this.defaultState);
-
-    this.rotate(-Math.PI * 0.5);
+    Player.call(this, team);
 };
 Object.defineProperties(ClientPlayer, {
-    ARRIVAL_SLOWING_RADIUS : {
-        value : 200
-    },
-
-    MIN_ARRIVAL_RADIUS : {
-        value : 8
-    },
-
     MINIMAP_FILL_STYLE : {
         value : "#06c833"
     }
 });
-ClientPlayer.prototype = Object.freeze(Object.create(LivingObject.prototype, {
+ClientPlayer.prototype = Object.freeze(Object.create(Player.prototype, {
+    update : {
+        value : function (dt) {
+            LivingObject.prototype.update.call(this, dt);
+        }
+    },
+    
     drawOnMinimap : {
         value : function (ctx) {
             var w = this.getWidth();
@@ -70,10 +39,12 @@ ClientPlayer.prototype = Object.freeze(Object.create(LivingObject.prototype, {
         }
     },
 
-    resolveCollision : {
-        value : function (physObj, collisionData) {
-            Player.prototype.resolveCollision.call(this, physObj, collisionData);
-        }
+    shoot : {
+        value : function () { }
+    },
+
+    justShot : {
+        value : function () { }
     }
 }));
 Object.freeze(ClientPlayer);

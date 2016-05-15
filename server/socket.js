@@ -4,7 +4,10 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 1000 * 2;
+var GAME_DURATION = 1000 * 10;
+var COUNTDOWN = 1000 * 5;
+var RESPAWN_DURATION = 1000 * 3;
+var PLAYER_HEALTH = 3;
 
 var configureSockets = function (socketio) {
     io = socketio;
@@ -25,6 +28,9 @@ var configureSockets = function (socketio) {
                 rotation     : -Math.PI * 0.5,
                 roomId       : undefined,
                 team         : undefined,
+                health       : PLAYER_HEALTH,
+                kills        : 0,
+                deaths       : 0,
                 ready        : false,
                 ping         : -1
             };
@@ -65,6 +71,9 @@ var configureSockets = function (socketio) {
                     velocity     : data.velocity,
                     acceleration : data.acceleration,
                     rotation     : data.rotation,
+                    health       : clients[id].health,
+                    kills        : clients[id].kills,
+                    deaths       : clients[id].deaths,
                     team         : clients[id].team,
                     ready        : clients[id].ready
                 };
@@ -87,6 +96,9 @@ var configureSockets = function (socketio) {
                     velocity     : clients[id].velocity,
                     acceleration : clients[id].acceleration,
                     rotation     : clients[id].rotation,
+                    health       : clients[id].health,
+                    kills        : clients[id].kills,
+                    deaths       : clients[id].deaths,
                     team         : clients[id].team,
                     ready        : data.ready
                 };
@@ -172,10 +184,15 @@ var configureSockets = function (socketio) {
             if (room.playing) {
                 room.playing = false;
                 room.timeRemaining = GAME_DURATION;
+                room.countdown = COUNTDOWN;
                 room.hostId = -1;
 
+                // Reset players' info for that game
                 for (var i = 0; i < room.players.length; i++) {
                     clients[room.players[i]].ready = false;
+                    clients[room.players[i]].health = PLAYER_HEALTH;
+                    clients[room.players[i]].kills = 0;
+                    clients[room.players[i]].deaths = 0;
                 }
 
                 io.sockets.in("room" + room.id).emit('updateRooms', rooms);
@@ -198,6 +215,53 @@ var configureSockets = function (socketio) {
                 } else {
                     endGame(data);
                 }
+            }
+        });
+
+        socket.on('countdown', function (data) {
+            var player = clients[id];
+            var room = rooms[player.roomId];
+
+            if (room.playing && room.countdown > 0) {
+                data.countdown = Math.max(data.countdown, 0);
+                room.countdown = data.countdown;
+
+                var countdownMessage = { countdown : room.countdown };
+                socket.broadcast.to("room" + player.roomId).emit('countdown', countdownMessage);
+            }
+        });
+
+        var onPlayerRespawn = function (data) {
+            var deadPlayer = clients[data.dead];
+            var room = rooms[deadPlayer.roomId];
+
+            if (room.playing) {
+                var respawnMessage = {
+                    respawn : deadPlayer.id
+                };
+                io.sockets.in("room" + room.id).emit('playerRespawn', respawnMessage);
+            }
+        };
+
+        socket.on('playerDeath', function (data) {
+            var deadPlayer = clients[data.dead];
+            var killerPlayer = clients[data.killer];
+            var room = rooms[deadPlayer.roomId];
+
+            deadPlayer.deaths++;
+            killerPlayer.kills++;
+
+            var playerDeathMessage = {
+                dead : data.dead,
+                killer : data.killer
+            };
+
+            io.sockets.in("room" + room.id).emit('playerDeath', playerDeathMessage);
+
+            // If there is enough time remaining in the game, set a timeout
+            // for the player's respawn
+            if (room.timeRemaining >= RESPAWN_DURATION) {
+                setTimeout(onPlayerRespawn.bind(this, data), RESPAWN_DURATION);
             }
         });
 
@@ -229,6 +293,8 @@ var configureSockets = function (socketio) {
             room.teamB = [];
             room.hostId = -1;
             room.timeRemaining = GAME_DURATION;
+            room.countdown = COUNTDOWN;
+            room.respawnTime = RESPAWN_DURATION;
 
             rooms[room.id] = room;
             roomCounter++;

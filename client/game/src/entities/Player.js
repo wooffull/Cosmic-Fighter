@@ -10,8 +10,6 @@ var geom = wfl.geom;
 var Player = function (team) {
     LivingObject.call(this);
 
-    this.solid = true;
-
     this.customData.team = team;
 
     var shipType;
@@ -38,8 +36,20 @@ var Player = function (team) {
     this.defaultState.addFrame(frameObj);
     this.addState(GameObject.STATE.DEFAULT, this.defaultState);
 
+    // Create explosion state
+    this.explosionGraphic = Assets.get(Assets.EXPLOSION);
+    this.explosionState = this.createState();
+
+    frameObj = this.createFrame(this.explosionGraphic, 1, false);
+    frameObj.vertices = verts;
+    this.explosionState.addFrame(frameObj);
+    this.addState(Player.STATE.EXPLOSION, this.explosionState);
+
     this.shootTimer = 0;
     this.maxShootTimer = Player.DEFAULT_MAX_SHOOT_TIMER;
+
+    this.health = Network.localClient.data.health;
+    this.maxHealth = Network.localClient.data.health;
 
     this.rotate(-Math.PI * 0.5);
 };
@@ -66,6 +76,12 @@ Object.defineProperties(Player, {
 
     DEFAULT_MAX_SHOOT_TIMER : {
         value : 20
+    },
+
+    STATE : {
+        value : {
+            EXPLOSION : "explosion"
+        }
     }
 });
 Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
@@ -140,7 +156,7 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
         value : function (physObj, collisionData) {
             var team = this.customData.team;
             var otherTeam = physObj.customData.team;
-        
+
             // If hitting something that's not on this team
             if (otherTeam === undefined || otherTeam !== team || physObj.takeDamage) {
                 LivingObject.prototype.resolveCollision.call(this, physObj, collisionData);

@@ -17,8 +17,11 @@ var Network = {
         PLAY               : "play",
         START_GAME         : "startGame",
         END_GAME           : "endGame",
+        PLAYER_DEATH       : "playerDeath",
+        PLAYER_RESPAWN     : "playerRespawn",
         BULLET             : "bullet",
-        CLOCK_TICK         : "clockTick"
+        CLOCK_TICK         : "clockTick",
+        COUNTDOWN          : "countdown"
     },
 
     init : function () {
@@ -36,7 +39,10 @@ var Network = {
         this.socket.on('setHost', this._onSetHost.bind(this));
         this.socket.on('startGame', this._onStartGame.bind(this));
         this.socket.on('endGame', this._onEndGame.bind(this));
+        this.socket.on('playerDeath', this._onPlayerDeath.bind(this));
+        this.socket.on('playerRespawn', this._onPlayerRespawn.bind(this));
         this.socket.on('bullet', this._onBullet.bind(this));
+        this.socket.on('countdown', this._onCountdown.bind(this));
         this.socket.on('clockTick', this._onClockTick.bind(this));
 
         this.socket.emit('init', {
@@ -180,9 +186,30 @@ var Network = {
         );
     },
 
+    _onPlayerDeath : function (data) {
+        $(this).trigger(
+            this.Event.PLAYER_DEATH,
+            data
+        );
+    },
+
+    _onPlayerRespawn : function (data) {
+        $(this).trigger(
+            this.Event.PLAYER_RESPAWN,
+            data
+        );
+    },
+
     _onBullet : function (data) {
         $(this).trigger(
             this.Event.BULLET,
+            data
+        );
+    },
+
+    _onCountdown : function (data) {
+        $(this).trigger(
+            this.Event.COUNTDOWN,
             data
         );
     },

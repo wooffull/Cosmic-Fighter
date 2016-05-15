@@ -9,7 +9,10 @@ module.exports = {
     WEAK_BULLET_2 : "./assets/img/BulletWeak_b.png",
     WEAK_BULLET_3 : "./assets/img/BulletWeak_c.png",
     WEAK_BULLET_4 : "./assets/img/BulletWeak_d.png",
-    
+    EXPLOSION     : "./assets/img/Explosion.png",
+    HP_FULL       : "./assets/img/HealthOrbFull.png",
+    HP_EMPTY      : "./assets/img/HealthOrbEmpty.png",
+
     // Preloader replaces getter with appropriate definition
     get        : function (path) { }
 };

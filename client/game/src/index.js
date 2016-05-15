@@ -42,11 +42,6 @@ var goToGame = function (room) {
     game.setScene(gameScene);
 
     $(Network).on(
-        Network.Event.CLOCK_TICK,
-        gameScene.onClockTick.bind(gameScene)
-    );
-
-    $(Network).on(
         Network.Event.END_GAME,
         onEndGame
     );

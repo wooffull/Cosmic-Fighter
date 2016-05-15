@@ -15,7 +15,7 @@ var Bullet = function (damage, creator) {
     }
 
     PhysicsObject.call(this);
-    
+
     this.creator = creator;
     this.customData.team = creator.customData.team;
     this.customData.ignoreFriction = true;
@@ -76,15 +76,23 @@ Bullet.prototype = Object.freeze(Object.create(PhysicsObject.prototype, {
         value : function (physObj, collisionData) {
             var team = this.customData.team;
             var otherTeam = physObj.customData.team;
-        
+
             if (physObj !== this.creator && physObj.solid) {
                 this.customData.removed = true;
-                
-                // If hitting something that's on a team (player, bullet, etc)...
+
+                // If hitting something that's on a team (player, bullet,
+                // etc)...
                 if (otherTeam !== undefined) {
-                    // If the bullet hits a player on a different team, deal damage to them
+                    // If the bullet hits a player on a different team, deal
+                    // damage to them
                     if (otherTeam !== team && physObj.takeDamage) {
                         physObj.takeDamage(this.damage);
+
+                        // If killed the player, we'll make the cam follow this
+                        // bullet's creator
+                        if (physObj.health <= 0) {
+                            physObj.customData.killer = this.creator;
+                        }
                     }
                 }
             }

@@ -83,7 +83,6 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             Network.socket.emit('updateReady', {
                 ready : clientWillBeReady
             });
-            console.log("CLICKED READY BUTTON");
         }
     },
 

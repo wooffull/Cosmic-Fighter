@@ -164,7 +164,8 @@ button:hover  {
     box-sizing: border-box;
     text-align: left;
 
-    transition: width .3s;
+    transition: width .3s,
+                background-color .3s;
 }
 
 .lobby-overlay-left {
@@ -183,6 +184,7 @@ button:hover  {
 
 .lobby-overlay-minimized-side {
     width: 35%;
+    background-color: #141415;
 }
 
 .lobby-overlay-button-container, .lobby-overlay-room-list {

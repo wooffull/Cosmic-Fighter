@@ -32,6 +32,8 @@ var GameScene = function (canvas, room) {
             client.gameObject.position.x = client.data.position.x;
             client.gameObject.position.y = client.data.position.y;
             client.gameObject.setRotation(client.data.rotation);
+            client.gameObject.customData.spawnPosition = client.data.position;
+            client.gameObject.customData.spawnRotation = client.data.rotation;
             this.addGameObject(gameObject, 1);
         }
     }
@@ -78,6 +80,8 @@ var GameScene = function (canvas, room) {
     this.player.position.x = Network.localClient.data.position.x;
     this.player.position.y = Network.localClient.data.position.y;
     this.player.setRotation(Network.localClient.data.rotation);
+    this.player.customData.spawnPosition = Network.localClient.data.position;
+    this.player.customData.spawnRotation = Network.localClient.data.rotation;
 
     Network.localClient.gameObject = this.player;
     this.player.customData.clientId = Network.localClient.data.id;
@@ -350,6 +354,9 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     onPlayerRespawn : {
         value : function (e, data) {
             var player = Network.clients[data.respawn].gameObject;
+            player.position.x = player.customData.spawnPosition.x;
+            player.position.y = player.customData.spawnPosition.y;
+            player.setRotation(player.customData.spawnRotation);
             player.setState(GameObject.STATE.DEFAULT);
             player.health = player.maxHealth;
             player.solid = true;

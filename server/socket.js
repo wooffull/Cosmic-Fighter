@@ -189,9 +189,11 @@ var configureSockets = function (socketio) {
             var room = rooms[roomId];
             var teamA = [];
             var teamB = [];
+            var i;
+            var curPlayer;
 
             // Reset players' info for this game
-            for (var i = 0; i < room.players.length; i++) {
+            for (i = 0; i < room.players.length; i++) {
                 clients[room.players[i]].health = PLAYER_HEALTH;
                 clients[room.players[i]].kills = 0;
                 clients[room.players[i]].deaths = 0;
@@ -199,8 +201,8 @@ var configureSockets = function (socketio) {
 
             var blockSize = 128;
 
-            for (var i = 0; i < room.teamA.length; i++) {
-                var curPlayer = clients[room.teamA[i]];
+            for (i = 0; i < room.teamA.length; i++) {
+                curPlayer = clients[room.teamA[i]];
 
                 switch (i) {
                 case 0:
@@ -228,8 +230,8 @@ var configureSockets = function (socketio) {
 
                 teamA.push(curPlayer);
             }
-            for (var i = 0; i < room.teamB.length; i++) {
-                var curPlayer = clients[room.teamB[i]];
+            for (i = 0; i < room.teamB.length; i++) {
+                curPlayer = clients[room.teamB[i]];
 
                 switch (i) {
                 case 0:
@@ -270,13 +272,15 @@ var configureSockets = function (socketio) {
             var room = rooms[roomId];
             var teamA = [];
             var teamB = [];
+            var i;
+            var curPlayer;
 
-            for (var i = 0; i < room.teamA.length; i++) {
-                var curPlayer = clients[room.teamA[i]];
+            for (i = 0; i < room.teamA.length; i++) {
+                curPlayer = clients[room.teamA[i]];
                 teamA.push(curPlayer);
             }
-            for (var i = 0; i < room.teamB.length; i++) {
-                var curPlayer = clients[room.teamB[i]];
+            for (i = 0; i < room.teamB.length; i++) {
+                curPlayer = clients[room.teamB[i]];
                 teamB.push(curPlayer);
             }
 
@@ -288,7 +292,7 @@ var configureSockets = function (socketio) {
             io.sockets.in("room" + room.id).emit('gameOverData', gameOverMessage);
 
             // Reset players' info for that game
-            for (var i = 0; i < room.players.length; i++) {
+            for (i = 0; i < room.players.length; i++) {
                 clients[room.players[i]].health = PLAYER_HEALTH;
                 clients[room.players[i]].kills = 0;
                 clients[room.players[i]].deaths = 0;

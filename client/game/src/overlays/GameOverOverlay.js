@@ -116,7 +116,7 @@ GameOverOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
                     deaths = curPlayer.deaths;
 
                     if (curPlayer.id === localId) {
-                        playerContainer.addClass("lobby-overlay-local-player-container");
+                        label = "*" + label;
                     }
                 } else {
                     label = "------";
@@ -152,7 +152,7 @@ GameOverOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
                     deaths = curPlayer.deaths;
 
                     if (curPlayer.id === localId) {
-                        playerContainer.addClass("lobby-overlay-local-player-container");
+                        label = "*" + label;
                     }
                 } else {
                     label = "------";

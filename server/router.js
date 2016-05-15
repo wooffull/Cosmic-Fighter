@@ -42,34 +42,17 @@ var router = function (app) {
         controllers.Account.gamePage
     );
 
-	app.get(
-        "/account",
+    app.get(
+        "/getScore",
         mid.requiresLogin,
-        controllers.Account.accountPage
+        controllers.Account.getScore
     );
 
-	app.get(
-        "/rooms",
+    app.post(
+        "/score",
+        mid.requiresSecure,
         mid.requiresLogin,
-        controllers.Ship.shipPage
-    );
-
-	app.get(
-        "/ship",
-        mid.requiresLogin,
-        controllers.Ship.shipPage
-    );
-
-	app.post(
-        "/ship",
-        mid.requiresLogin,
-        controllers.Ship.make
-    );
-
-	app.post(
-        "/remove",
-        mid.requiresLogin,
-        controllers.Ship.remove
+        controllers.Account.score
     );
 
 	app.get(

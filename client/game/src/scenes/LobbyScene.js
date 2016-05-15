@@ -34,6 +34,8 @@ var LobbyScene = function (canvas) {
         setInterval(this.updateRoomList.bind(this), LobbyScene.ROOM_UPDATE_FREQUENCY);
 
     this.updateRoomList();
+
+    this._requestKdr();
 };
 
 Object.defineProperties(LobbyScene, {
@@ -64,6 +66,24 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
     updateRoomList : {
         value : function () {
             Network.getRooms();
+        }
+    },
+
+    _requestKdr : {
+        value : function () {
+            $.ajax({
+                cache: false,
+                type: "GET",
+                url: "/getScore",
+                dataType: "json",
+                success: this._onGetKdr.bind(this)
+            });
+        }
+    },
+
+    _onGetKdr : {
+        value : function (result, status, xhr) {
+            this.lobbyOverlay.renderKdr(result);
         }
     },
 
@@ -116,7 +136,7 @@ LobbyScene.prototype = Object.freeze(Object.create(Scene.prototype, {
 
     _onCreateRoom : {
         value : function (e) {
-            var name = this.createRoomOverlay.inputField.val();
+            var name = this.createRoomOverlay.inputField.val().trim();
 
             if (name !== "") {
                 this.createRoomOverlay.domObject.hide();

@@ -201,21 +201,40 @@ button:hover  {
 
 .lobby-overlay-room-list {
     text-align: left;
-    height: 80%;
+    height: calc(75% - 1em);
+    width: calc(100% - 2em);
+    padding: 0 1em;
+    margin-bottom: 1em;
+    overflow: auto;
+    border: 1px solid #C0C0C0;
+    border-radius: 2px;
+    background-color: #E8E8E8;
+    color: #000;
+}
+
+.lobby-overlay-kdr-container {
+    text-align: left;
+    height: 5%;
 }
 
 .lobby-overlay-room {
     transition: background-color 0.1s;
     margin: 0.25em 0;
+    
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lobby-overlay-room:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgb(166, 197, 210);
     cursor: pointer;
 }
 
 .lobby-overlay-room-label-container {
     margin-bottom: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lobby-overlay-ready-btn {
@@ -232,19 +251,18 @@ button:hover  {
     width: 100%;
 }
 
+.lobby-overlay-teamA-container div, .lobby-overlay-teamB-container div {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .lobby-overlay-teamA-container {
     color: #E491FF;
 }
 
 .lobby-overlay-teamB-container {
     color: #86c8d3;
-}
-
-.lobby-overlay-local-player-container {
-}
-
-.lobby-overlay-local-player-container:before {
-    content: "* ";
 }
 
 .lobby-overlay-ready-container {

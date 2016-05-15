@@ -19,10 +19,10 @@ var GameScene = function (canvas, room) {
 
     // Add other clients that are already connected
     var room = Network.rooms[room.id];
-    var players = room.players;
+    this.players = room.players;
 
-    for (var i = 0; i < players.length; i++) {
-        var id = players[i];
+    for (var i = 0; i < this.players.length; i++) {
+        var id = this.players[i];
         var client = Network.clients[id];
 
         if (client !== Network.localClient) {
@@ -185,6 +185,7 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
 
             ctx.save();
 
+            var cameraPos    = this.camera.position;
             var screenWidth  = ctx.canvas.width;
             var screenHeight = ctx.canvas.height;
             var offset       = new geom.Vec2(
@@ -193,6 +194,25 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             );
 
             ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            ctx.font = "12px Munro";
+
+            // Write players' names under their ship
+            for (var i = 0; i < this.players.length; i++) {
+                var client = Network.clients[this.players[i]];
+                var objOffset = new geom.Vec2(
+                    client.gameObject.position.x - cameraPos.x,
+                    client.gameObject.position.y - cameraPos.y
+                );
+                
+                ctx.save();
+                ctx.translate(objOffset.x, objOffset.y + 24);
+                ctx.translate(offset.x, offset.y);
+                ctx.fillText(client.data.user, 0, 0);
+                ctx.restore();
+            }
+            
             ctx.font = "24px Munro";
 
             // Show the remaining duration of the game
@@ -223,8 +243,6 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             }
 
             ctx.translate(offset.x, 0);
-            ctx.textAlign = "center";
-            ctx.textBaseline = "top";
             ctx.fillText(timeText, 0, 0);
 
             // Show the initial countdown before the game
@@ -266,6 +284,15 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                 ctx.textBaseline = "middle";
                 ctx.font = "96px Munro";
                 ctx.fillText(countdownText, 0, 0);
+
+                // Also draw controls!
+                ctx.fillStyle = "#fff";
+                ctx.translate(0, 48);
+                ctx.font = "24px Munro";
+                ctx.fillText("Use Arrow Keys to Move", 0, 0);
+
+                ctx.translate(0, 24);
+                ctx.fillText("Press Z to Shoot", 0, 0);
             }
 
             ctx.restore();

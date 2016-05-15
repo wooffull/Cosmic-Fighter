@@ -7,16 +7,15 @@ block body
     .navlink
       a(href="/game") Game
     .navlink
-      a(href="/ship") Ships
-    .navlink
-      a(href="/account") Account
-    .navlink
       a(href="/logout") Log Out
     span#userSpan Logged in as 
       span#userName #{owner}
   div#game-content
     span(class="canvas-container")
       canvas#game-canvas(width="640" height="480")
+    section#score
+      form#scoreForm(class="scoreForm", name="scoreForm", action="/score", method="POST")
+        input(type="hidden", name="_csrf", value="#{csrfToken}")
 block scripts
     script(src="/socket.io/socket.io.js")
     script(src="/assets/lib/preloadjs-0.6.1.min.js")

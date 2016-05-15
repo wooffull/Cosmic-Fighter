@@ -29,6 +29,12 @@ var LobbyOverlay = function () {
     this.roomListContainer.html("Loading rooms...");
     this.leftContainer.append(this.roomListContainer);
 
+    this.kdrContainer = $("<div>");
+    this.kdrContainer.addClass("lobby-overlay-kdr-container");
+    this.leftContainer.append(this.kdrContainer);
+
+    this.renderKdr();
+
     // Set up right side
     this.rightContainer = $("<span>");
     this.rightContainer.addClass("lobby-overlay-right");
@@ -175,7 +181,7 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
                         label = curPlayer.data.user;
 
                         if (curId === localId) {
-                            playerContainer.addClass("lobby-overlay-local-player-container");
+                            label = "*" + label;
 
                             if (!ready) {
                                 this.readyBtn.html("Ready");
@@ -213,7 +219,7 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
                         label = curPlayer.data.user;
 
                         if (curId === localId) {
-                            playerContainer.addClass("lobby-overlay-local-player-container");
+                            label = "*" + label;
 
                             if (!ready) {
                                 this.readyBtn.html("Ready");
@@ -239,6 +245,27 @@ LobbyOverlay.prototype = Object.freeze(Object.create(Overlay.prototype, {
                 }
 
                 this.switchTeamBtn.show();
+            }
+        }
+    },
+
+    renderKdr : {
+        value : function (data) {
+            if (!data) {
+                this.kdrContainer.html("KDR: ---");
+            } else {
+                var kills = data.kills;
+                var deaths = data.deaths;
+
+                var ratio;
+
+                if (deaths === 0) {
+                    ratio = kills;
+                } else {
+                    ratio = Math.floor((kills / deaths) * 100) / 100;
+                }
+
+                this.kdrContainer.html("KDR: " + ratio.toFixed(2));
             }
         }
     },

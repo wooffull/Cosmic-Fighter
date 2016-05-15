@@ -2,7 +2,7 @@
 
 var util = require('../util');
 var Assets = util.Assets;
-var Player = require('./Player');
+var Player = require('./Player.js');
 var LivingObject = wfl.core.entities.LivingObject;
 var geom = wfl.geom;
 
@@ -15,12 +15,10 @@ Object.defineProperties(ClientPlayer, {
     }
 });
 ClientPlayer.prototype = Object.freeze(Object.create(Player.prototype, {
-    update : {
-        value : function (dt) {
-            LivingObject.prototype.update.call(this, dt);
-        }
+    sendUpdateToServer : {
+        value : function () { }
     },
-    
+
     drawOnMinimap : {
         value : function (ctx) {
             var w = this.getWidth();

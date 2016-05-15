@@ -5,6 +5,8 @@ var Assets = util.Assets;
 var Network = require('../network');
 var GameObject = wfl.core.entities.GameObject;
 var LivingObject = wfl.core.entities.LivingObject;
+var particles = require('../particles');
+var Emitter = particles.Emitter;
 var geom = wfl.geom;
 
 var Player = function (team) {
@@ -61,6 +63,10 @@ var Player = function (team) {
     this.shootTimer = 0;
     this.maxShootTimer = Player.DEFAULT_MAX_SHOOT_TIMER;
 
+    this.exhaust = new Emitter();
+    this.exhaustTimer = 0;
+    this.maxExhaustTimer = Player.DEFAULT_MAX_EXHAUST_TIMER;
+
     this.health = Network.localClient.data.health;
     this.maxHealth = Network.localClient.data.health;
 
@@ -91,6 +97,14 @@ Object.defineProperties(Player, {
         value : 20
     },
 
+    MIN_EXHAUST_ACCELERATION : {
+        value : 0.0004
+    },
+
+    DEFAULT_MAX_EXHAUST_TIMER : {
+        value : 10
+    },
+
     STATE : {
         value : {
             EXPLOSION : "explosion"
@@ -111,6 +125,31 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                 }
             }
 
+            if (this.health > 0) {
+                if (this.acceleration.getMagnitudeSquared() > Player.MIN_EXHAUST_ACCELERATION * Player.MIN_EXHAUST_ACCELERATION) {
+                    // Add the next particle for the exhaust if we're able to
+                    if (this.exhaustTimer === 0) {
+                        var particlePosition = this.forward.clone().multiply(-this.defaultGraphic.height * 0.5);
+                        this.exhaust.addParticle(particlePosition, this.velocity);
+                    }
+                }
+
+                // Update exhaust timer for when to add the next particle
+                this.exhaustTimer += dt;
+                if (this.exhaustTimer >= this.maxExhaustTimer) {
+                    this.exhaustTimer = 0;
+                }
+            }
+
+            // Update exhaust particle system
+            this.exhaust.update(dt);
+
+            this.sendUpdateToServer();
+        }
+    },
+
+    sendUpdateToServer : {
+        value : function () {
             // If the player is connected to the network, send out updates to
             // other players when necessary
             if (Network.connected) {
@@ -121,6 +160,14 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                     rotation     : this.getRotation()
                 });
             }
+        }
+    },
+
+    draw : {
+        value : function (ctx) {
+            LivingObject.prototype.draw.call(this, ctx);
+
+            this.exhaust.draw(ctx);
         }
     },
 

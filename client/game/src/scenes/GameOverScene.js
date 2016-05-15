@@ -42,6 +42,26 @@ GameOverScene.prototype = Object.freeze(Object.create(Scene.prototype, {
         value : function (e, data) {
             this.loadingOverlay.domObject.remove();
             this.gameOverOverlay.renderScore(data);
+
+            var localPlayerData;
+            var teamA = data.teamA;
+            var teamB = data.teamB;
+
+            for (var i = 0; i < teamA.length; i++) {
+                if (teamA[i].id === Network.localClient.id) {
+                    localPlayerData = teamA[i];
+                    break;
+                }
+            }
+
+            for (var i = 0; i < teamB.length; i++) {
+                if (teamB[i].id === Network.localClient.id) {
+                    localPlayerData = teamB[i];
+                    break;
+                }
+            }
+
+            this._sendScoreToServer(localPlayerData);
         }
     },
 
@@ -51,6 +71,27 @@ GameOverScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                 GameOverScene.Event.RETURN_TO_LOBBY,
                 this.room
             );
+        }
+    },
+
+    _sendScoreToServer : {
+        value : function (playerData) {
+            var kills = playerData.kills;
+            var deaths = playerData.deaths;
+            var form = $("#scoreForm");
+            var formData = form.serialize();
+            
+            formData += "&kills=" + kills;
+            formData += "&deaths=" + deaths;
+            formData += "&username=" + playerData.user;
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "/score",
+                data: formData,
+                dataType: "json"
+            });
         }
     }
 }));

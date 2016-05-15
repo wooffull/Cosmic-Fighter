@@ -4,10 +4,11 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 60 * 1000 * 2;
+var GAME_DURATION = 10 * 1000 * 2;
 var COUNTDOWN = 1000 * 5;
 var RESPAWN_DURATION = 1000 * 3;
 var PLAYER_HEALTH = 3;
+var MAX_ROOM_NAME_LENGTH = 30;
 
 var configureSockets = function (socketio) {
     io = socketio;
@@ -399,7 +400,7 @@ var configureSockets = function (socketio) {
 
         socket.on('createRoom', function (data) {
             var room = {};
-            room.name = data.name;
+            room.name = data.name.substr(0, MAX_ROOM_NAME_LENGTH);
             room.id = roomCounter;
             room.players = [];
             room.playing = false;

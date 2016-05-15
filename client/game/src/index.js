@@ -56,6 +56,8 @@ var goToLobby = function () {
     // overlays
     game.stop();
 
+    $(game.getScene()).off();
+
     // Reset all listeners on the Network
     $(Network).off();
 
@@ -72,11 +74,32 @@ var goToLobby = function () {
     $("body").css({"background-color": "#071213"});
 };
 
+var goToGameOver = function (room) {
+    // Stop the game so that canvas updates don't affect performance with
+    // overlays
+    game.stop();
+
+    // Reset all listeners on the Network
+    $(Network).off();
+
+    var gameOverScene = new scenes.GameOverScene(canvas, room);
+    game.setScene(gameOverScene);
+
+    $(gameOverScene).on(
+        scenes.GameOverScene.Event.RETURN_TO_LOBBY,
+        onGameOverToLobby
+    );
+};
+
 var onStartGame = function (e, room) {
     goToGame(room);
 };
 
 var onEndGame = function (e, room) {
+    goToGameOver(room);
+};
+
+var onGameOverToLobby = function (e, room) {
     goToLobby();
 
     // Trigger an event so the lobby scene knows to join the room it was just

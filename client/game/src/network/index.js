@@ -21,7 +21,8 @@ var Network = {
         PLAYER_RESPAWN     : "playerRespawn",
         BULLET             : "bullet",
         CLOCK_TICK         : "clockTick",
-        COUNTDOWN          : "countdown"
+        COUNTDOWN          : "countdown",
+        GAME_OVER_DATA     : "gameOverData"
     },
 
     init : function () {
@@ -44,6 +45,7 @@ var Network = {
         this.socket.on('bullet', this._onBullet.bind(this));
         this.socket.on('countdown', this._onCountdown.bind(this));
         this.socket.on('clockTick', this._onClockTick.bind(this));
+        this.socket.on('gameOverData', this._onGameOverData.bind(this));
 
         this.socket.emit('init', {
             user : $("#userName").html()
@@ -217,6 +219,13 @@ var Network = {
     _onClockTick : function (data) {
         $(this).trigger(
             this.Event.CLOCK_TICK,
+            data
+        );
+    },
+
+    _onGameOverData : function (data) {
+        $(this).trigger(
+            this.Event.GAME_OVER_DATA,
             data
         );
     }

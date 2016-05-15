@@ -4,7 +4,7 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 1000 * 10;
+var GAME_DURATION = 1000 * 2;
 var COUNTDOWN = 1000 * 5;
 var RESPAWN_DURATION = 1000 * 3;
 var PLAYER_HEALTH = 3;
@@ -175,6 +175,28 @@ var configureSockets = function (socketio) {
 
         socket.on('updateRooms', function () {
             socket.emit('updateRooms', rooms);
+        });
+
+        socket.on('gameOverData', function (roomId) {
+            var room = rooms[roomId];
+            var teamA = [];
+            var teamB = [];
+
+            for (var i = 0; i < room.teamA.length; i++) {
+                var curPlayer = clients[room.teamA[i]];
+                teamA.push(curPlayer);
+            }
+            for (var i = 0; i < room.teamB.length; i++) {
+                var curPlayer = clients[room.teamB[i]];
+                teamB.push(curPlayer);
+            }
+
+            var gameOverMessage = {
+                teamA : teamA,
+                teamB : teamB
+            };
+
+            socket.emit('gameOverData', gameOverMessage);
         });
 
         var endGame = function (data) {

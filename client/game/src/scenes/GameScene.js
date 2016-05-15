@@ -243,6 +243,7 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             // Show the initial countdown before the game
             if (this.initialCountdown > 0) {
                 var countdownSeconds = Math.round(this.initialCountdown / 1000);
+                var countdownText = countdownSeconds.toString();
                 ctx.fillStyle = "#fff";
 
                 switch (countdownSeconds) {
@@ -268,6 +269,7 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                     break;
 
                 case 0:
+                    countdownText = "FIGHT";
                     ctx.fillStyle = "#fff";
                     break;
                 }
@@ -276,7 +278,7 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.font = "96px Munro";
-                ctx.fillText(countdownSeconds.toString(), 0, 0);
+                ctx.fillText(countdownText, 0, 0);
             }
 
             ctx.restore();

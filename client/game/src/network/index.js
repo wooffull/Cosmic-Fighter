@@ -22,6 +22,7 @@ var Network = {
         BULLET             : "bullet",
         CLOCK_TICK         : "clockTick",
         COUNTDOWN          : "countdown",
+        GAME_START_DATA    : "gameStartData",
         GAME_OVER_DATA     : "gameOverData"
     },
 
@@ -45,6 +46,7 @@ var Network = {
         this.socket.on('bullet', this._onBullet.bind(this));
         this.socket.on('countdown', this._onCountdown.bind(this));
         this.socket.on('clockTick', this._onClockTick.bind(this));
+        this.socket.on('gameStartData', this._onGameStartData.bind(this));
         this.socket.on('gameOverData', this._onGameOverData.bind(this));
 
         this.socket.emit('init', {
@@ -219,6 +221,13 @@ var Network = {
     _onClockTick : function (data) {
         $(this).trigger(
             this.Event.CLOCK_TICK,
+            data
+        );
+    },
+
+    _onGameStartData : function (data) {
+        $(this).trigger(
+            this.Event.GAME_START_DATA,
             data
         );
     },

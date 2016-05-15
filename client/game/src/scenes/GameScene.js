@@ -9,8 +9,8 @@ var PhysicsObject = wfl.core.entities.PhysicsObject;
 var entities = require('../entities');
 var Bullet = entities.Bullet;
 var ClientPlayer = entities.ClientPlayer;
-var FullBock = entities.FullBlock;
 var Player = entities.Player;
+var levels = require('../levels');
 var backgrounds = wfl.display.backgrounds;
 var geom = wfl.geom;
 
@@ -29,6 +29,9 @@ var GameScene = function (canvas, room) {
             var gameObject = new ClientPlayer(client.data.team);
             client.gameObject = gameObject;
             client.gameObject.customData.clientId = client.data.id;
+            client.gameObject.position.x = client.data.position.x;
+            client.gameObject.position.y = client.data.position.y;
+            client.gameObject.setRotation(client.data.rotation);
             this.addGameObject(gameObject, 1);
         }
     }
@@ -58,63 +61,31 @@ var GameScene = function (canvas, room) {
         this.onPlayerRespawn.bind(this)
     );
 
+    // TODO: Design levels better
+    levels.Level1(this);
+
     this.timeRemaining = room.timeRemaining;
     this.initialCountdown = room.countdown;
     this.countingDown = true;
     this.respawnTime = room.respawnTime;
     this.respawnTimeRemaining = this.respawnTime;
 
-    var wallSize = 10;
-    var blockSize = 128;
-    var offset = -(wallSize * 0.5 - 1) * blockSize;
-
-    // Line the top
-    for (var i = 0; i < 9; i++) {
-        var newBlock = new FullBock();
-        newBlock.position.x = blockSize * i + offset;
-        newBlock.position.y = offset;
-
-        this.addGameObject(newBlock);
-    }
-
-    // Line the bottom
-    for (var i = 0; i < 9; i++) {
-        var newBlock = new FullBock();
-        newBlock.position.x = blockSize * i + offset;
-        newBlock.position.y = -offset;
-
-        this.addGameObject(newBlock);
-    }
-
-    // Line the left
-    for (var i = 1; i < 8; i++) {
-        var newBlock = new FullBock();
-        newBlock.position.x = offset;
-        newBlock.position.y = blockSize * i + offset;
-
-        this.addGameObject(newBlock);
-    }
-
-    // Line the right
-    for (var i = 1; i < 8; i++) {
-        var newBlock = new FullBock();
-        newBlock.position.x = -offset;
-        newBlock.position.y = blockSize * i + offset;
-
-        this.addGameObject(newBlock);
-    }
-
     this.bg = new backgrounds.ParallaxBackground(
         Assets.get(Assets.BG_TILE)
     );
 
     this.player = new Player(Network.localClient.data.team);
+    this.player.position.x = Network.localClient.data.position.x;
+    this.player.position.y = Network.localClient.data.position.y;
+    this.player.setRotation(Network.localClient.data.rotation);
 
     Network.localClient.gameObject = this.player;
     this.player.customData.clientId = Network.localClient.data.id;
     this.addGameObject(this.player, 2);
 
     this.camera.follow(this.player);
+    this.camera.position.x = this.player.position.x;
+    this.camera.position.y = this.player.position.y;
 };
 Object.defineProperties(GameScene, {
     FRICTION : {
@@ -223,8 +194,8 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             // Show the remaining duration of the game
             var timeText;
             if (this.timeRemaining > 0) {
-                var minutes = Math.floor((this.timeRemaining + 999) / (1000 * 60));
-                var seconds = Math.round((this.timeRemaining - minutes * 1000 * 60) / 1000);
+                var minutes = Math.floor((this.timeRemaining) / (1000 * 60));
+                var seconds = Math.floor((this.timeRemaining - minutes * 1000 * 60) / 1000);
                 timeText = minutes + ":";
 
                 if (seconds < 10) {
@@ -341,7 +312,7 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
 
     onClockTick : {
         value : function (e, data) {
-            this.timeRemaining = data.timeRemaining;
+            this.timeRemaining = parseInt(data.timeRemaining);
         }
     },
 

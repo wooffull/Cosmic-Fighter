@@ -4,7 +4,7 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 10 * 1000 * 1;
+var GAME_DURATION = 60 * 1000 * 2;
 var COUNTDOWN = 1000 * 5;
 var RESPAWN_DURATION = 1000 * 3;
 var PLAYER_HEALTH = 3;
@@ -22,7 +22,7 @@ var configureSockets = function (socketio) {
             var client = {
                 user         : data.user,
                 id           : clientCounter,
-                position     : { x : Math.random() * 200 - 100, y : Math.random() * 200 - 100 },
+                position     : { x : 0, y : 0 },
                 velocity     : { x : 0, y : 0 },
                 acceleration : { x : 0, y : 0 },
                 rotation     : -Math.PI * 0.5,
@@ -182,6 +182,87 @@ var configureSockets = function (socketio) {
 
         socket.on('updateRooms', function () {
             socket.emit('updateRooms', rooms);
+        });
+
+        socket.on('gameStartData', function (roomId) {
+            var room = rooms[roomId];
+            var teamA = [];
+            var teamB = [];
+
+            // Reset players' info for this game
+            for (var i = 0; i < room.players.length; i++) {
+                clients[room.players[i]].health = PLAYER_HEALTH;
+                clients[room.players[i]].kills = 0;
+                clients[room.players[i]].deaths = 0;
+            }
+
+            var blockSize = 128;
+
+            for (var i = 0; i < room.teamA.length; i++) {
+                var curPlayer = clients[room.teamA[i]];
+
+                switch (i) {
+                case 0:
+                    curPlayer.position.x = blockSize * 2;
+                    curPlayer.position.y = blockSize * 8;
+                    break;
+
+                case 1:
+                    curPlayer.position.x = blockSize * 1;
+                    curPlayer.position.y = blockSize * 7;
+                    break;
+
+                case 2:
+                    curPlayer.position.x = blockSize * 3;
+                    curPlayer.position.y = blockSize * 9;
+                    break;
+
+                case 3:
+                    curPlayer.position.x = blockSize * 1;
+                    curPlayer.position.y = blockSize * 9;
+                    break;
+                }
+
+                curPlayer.rotation = -Math.PI * 0.25;
+
+                teamA.push(curPlayer);
+            }
+            for (var i = 0; i < room.teamB.length; i++) {
+                var curPlayer = clients[room.teamB[i]];
+
+                switch (i) {
+                case 0:
+                    curPlayer.position.x = blockSize * 13;
+                    curPlayer.position.y = blockSize * 2;
+                    break;
+
+                case 1:
+                    curPlayer.position.x = blockSize * 14;
+                    curPlayer.position.y = blockSize * 3;
+                    break;
+
+                case 2:
+                    curPlayer.position.x = blockSize * 12;
+                    curPlayer.position.y = blockSize * 1;
+                    break;
+
+                case 3:
+                    curPlayer.position.x = blockSize * 14;
+                    curPlayer.position.y = blockSize * 1;
+                    break;
+                }
+
+                curPlayer.rotation = Math.PI * 0.75;
+
+                teamB.push(curPlayer);
+            }
+
+            var gameStartMessage = {
+                teamA : teamA,
+                teamB : teamB
+            };
+
+            io.sockets.in("room" + room.id).emit('gameStartData', gameStartMessage);
         });
 
         socket.on('gameOverData', function (roomId) {

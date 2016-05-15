@@ -37,12 +37,25 @@ var Player = function (team) {
     this.addState(GameObject.STATE.DEFAULT, this.defaultState);
 
     // Create explosion state
-    this.explosionGraphic = Assets.get(Assets.EXPLOSION);
+
+    if (team === 0) {
+        this.explosionGraphic1 = Assets.get(Assets.EXPLOSION_A_1);
+        this.explosionGraphic2 = Assets.get(Assets.EXPLOSION_A_2);
+        this.explosionGraphic3 = Assets.get(Assets.EXPLOSION_A_3);
+        this.explosionGraphic4 = Assets.get(Assets.EXPLOSION_END);
+    } else {
+        this.explosionGraphic1 = Assets.get(Assets.EXPLOSION_B_1);
+        this.explosionGraphic2 = Assets.get(Assets.EXPLOSION_B_2);
+        this.explosionGraphic3 = Assets.get(Assets.EXPLOSION_B_3);
+        this.explosionGraphic4 = Assets.get(Assets.EXPLOSION_END);
+    }
+
     this.explosionState = this.createState();
 
-    frameObj = this.createFrame(this.explosionGraphic, 1, false);
-    frameObj.vertices = verts;
-    this.explosionState.addFrame(frameObj);
+    this.explosionState.addFrame(this.createFrame(this.explosionGraphic1, 2));
+    this.explosionState.addFrame(this.createFrame(this.explosionGraphic2, 2));
+    this.explosionState.addFrame(this.createFrame(this.explosionGraphic3, 2));
+    this.explosionState.addFrame(this.createFrame(this.explosionGraphic4, Infinity));
     this.addState(Player.STATE.EXPLOSION, this.explosionState);
 
     this.shootTimer = 0;

@@ -60,6 +60,23 @@ var goToGame = function (room) {
     game.start();
 };
 
+var goToGameStart = function (room) {
+    // Stop the game so that canvas updates don't affect performance with
+    // overlays
+    game.stop();
+
+    // Reset all listeners on the Network
+    $(Network).off();
+
+    var gameStartScene = new scenes.GameStartScene(canvas, room);
+    game.setScene(gameStartScene);
+
+    $(gameStartScene).on(
+        scenes.GameStartScene.Event.START_GAME,
+        onGameStartToGame
+    );
+};
+
 var goToLobby = function () {
     // Draw black over the canvas
     ctx.fillStyle = "#040B0C";
@@ -105,11 +122,15 @@ var goToGameOver = function (room) {
 };
 
 var onStartGame = function (e, room) {
-    goToGame(room);
+    goToGameStart(room);
 };
 
 var onEndGame = function (e, room) {
     goToGameOver(room);
+};
+
+var onGameStartToGame = function (e, room) {
+    goToGame(room);
 };
 
 var onGetGameOverData = function (e, gameOverData) {

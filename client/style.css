@@ -2,7 +2,10 @@
 
 @font-face {
     font-family: "Munro";
-    src: url("font/Munro.ttf");
+    src: url('font/munro-webfont.woff2') format('woff2'),
+         url('font/munro-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
 }
 
 html, body {

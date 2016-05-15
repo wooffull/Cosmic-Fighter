@@ -48,11 +48,6 @@ FullBlock.prototype = Object.freeze(Object.create(PhysicsObject.prototype, {
 
             ctx.rotate(this.getRotation());
 
-            /*ctx.fillStyle =
-                app.gameobject.PhysicsObject.MINIMAP_FILL_STYLE;
-            ctx.strokeStyle =
-                app.gameobject.PhysicsObject.MINIMAP_STROKE_STYLE;*/
-
             ctx.beginPath();
             ctx.rect(offsetX, offsetY, displayWidth, displayHeight);
             ctx.fill();

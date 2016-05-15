@@ -4,7 +4,7 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 10 * 1000 * 2;
+var GAME_DURATION = 60 * 1000 * 2;
 var COUNTDOWN = 1000 * 5;
 var RESPAWN_DURATION = 1000 * 3;
 var PLAYER_HEALTH = 3;

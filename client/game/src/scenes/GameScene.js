@@ -361,6 +361,9 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             player.health = player.maxHealth;
             player.solid = true;
 
+            // Activate "spawn shield"
+            player.takeDamage(0);
+
             // If this client's player is respawning, then make the camera
             // start following it again
             if (player === this.player) {

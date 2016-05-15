@@ -10,7 +10,10 @@ var GameOverScene = function (canvas, room) {
     this.room = room;
 
     $(Network).on(Network.Event.GAME_OVER_DATA, this._onUpdateScore.bind(this));
-    Network.socket.emit(Network.Event.GAME_OVER_DATA, room.id);
+
+    if (Network.isHost()) {
+        Network.socket.emit(Network.Event.GAME_OVER_DATA, room.id);
+    }
 
     this.gameOverOverlay = new overlays.GameOverOverlay();
     $(canvas).parent().append(this.gameOverOverlay.domObject);

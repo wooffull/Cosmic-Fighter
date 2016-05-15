@@ -4,7 +4,7 @@ var rooms         = {};
 var clientCounter = 0; // Increases per client connection
 var roomCounter   = 0; // Increases per room addition
 
-var GAME_DURATION = 1000 * 2;
+var GAME_DURATION = 10 * 1000 * 1;
 var COUNTDOWN = 1000 * 5;
 var RESPAWN_DURATION = 1000 * 3;
 var PLAYER_HEALTH = 3;
@@ -134,6 +134,13 @@ var configureSockets = function (socketio) {
             }
         };
 
+        var startGame = function (roomId) {
+            var room = rooms[roomId];
+            room.playing = true;
+
+            io.sockets.in("room" + roomId).emit('startGame', room);
+        };
+
         socket.on('returnPing', function (pingObj) {
             var player = clients[id];
             var room = rooms[player.roomId];
@@ -162,11 +169,11 @@ var configureSockets = function (socketio) {
                 }
 
                 room.hostId = minPingPlayerId;
-                room.playing = true;
 
                 var hostObj = { id : minPingPlayerId };
                 io.sockets.in("room" + player.roomId).emit('setHost', hostObj);
-                io.sockets.in("room" + player.roomId).emit('startGame', room);
+
+                startGame(room.id);
             }
         });
 
@@ -196,7 +203,14 @@ var configureSockets = function (socketio) {
                 teamB : teamB
             };
 
-            socket.emit('gameOverData', gameOverMessage);
+            io.sockets.in("room" + room.id).emit('gameOverData', gameOverMessage);
+
+            // Reset players' info for that game
+            for (var i = 0; i < room.players.length; i++) {
+                clients[room.players[i]].health = PLAYER_HEALTH;
+                clients[room.players[i]].kills = 0;
+                clients[room.players[i]].deaths = 0;
+            }
         });
 
         var endGame = function (data) {
@@ -212,9 +226,6 @@ var configureSockets = function (socketio) {
                 // Reset players' info for that game
                 for (var i = 0; i < room.players.length; i++) {
                     clients[room.players[i]].ready = false;
-                    clients[room.players[i]].health = PLAYER_HEALTH;
-                    clients[room.players[i]].kills = 0;
-                    clients[room.players[i]].deaths = 0;
                 }
 
                 io.sockets.in("room" + room.id).emit('updateRooms', rooms);

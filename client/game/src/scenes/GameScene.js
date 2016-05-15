@@ -217,10 +217,13 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                 screenHeight * 0.5
             );
 
+            ctx.fillStyle = "#fff";
+            ctx.font = "24px Munro";
+
             // Show the remaining duration of the game
             var timeText;
             if (this.timeRemaining > 0) {
-                var minutes = Math.floor(this.timeRemaining / (1000 * 60));
+                var minutes = Math.floor((this.timeRemaining + 999) / (1000 * 60));
                 var seconds = Math.round((this.timeRemaining - minutes * 1000 * 60) / 1000);
                 timeText = minutes + ":";
 
@@ -233,10 +236,19 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
                 timeText = "0:00";
             }
 
+            if (this.timeRemaining < 1000 * 10) {
+                if (this.timeRemaining % 500 < 250) {
+                    ctx.fillStyle = "rgb(255, 79, 79)";
+                } else {
+                    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+                }
+                ctx.font = "30px Munro";
+            } else if (this.timeRemaining < 1000 * 30) {
+                ctx.fillStyle = "rgb(241, 208, 92)";
+            }
+
             ctx.translate(offset.x, 0);
-            ctx.fillStyle = "#fff";
             ctx.textAlign = "center";
-            ctx.font = "24px Munro";
             ctx.textBaseline = "top";
             ctx.fillText(timeText, 0, 0);
 

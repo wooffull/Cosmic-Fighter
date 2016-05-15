@@ -46,12 +46,25 @@ var goToGame = function (room) {
         onEndGame
     );
 
+    // If the player receives data for game over before they actually load the
+    // gave over screen, skip immediately to the game over screen (because only
+    // the host would send that data)
+    $(Network).on(
+        Network.Event.GAME_OVER_DATA,
+        room,
+        onGetGameOverData
+    );
+
     // Start the game since it was stopped to help performance with overlays on
     // a canvas
     game.start();
 };
 
 var goToLobby = function () {
+    // Draw black over the canvas
+    ctx.fillStyle = "#040B0C";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     // Stop the game so that canvas updates don't affect performance with
     // overlays
     game.stop();
@@ -97,6 +110,11 @@ var onStartGame = function (e, room) {
 
 var onEndGame = function (e, room) {
     goToGameOver(room);
+};
+
+var onGetGameOverData = function (e, gameOverData) {
+    goToGameOver(e.data);
+    game.getScene()._onUpdateScore(gameOverData);
 };
 
 var onGameOverToLobby = function (e, room) {

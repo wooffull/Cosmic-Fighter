@@ -106,6 +106,13 @@ Object.defineProperties(GameScene, {
     }
 });
 GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
+    destroy : {
+        value : function () {
+            // Stop all sounds
+            createjs.Sound.stop();
+        }
+    },
+
     /**
      * Updates the scene and all game objects in it
      */

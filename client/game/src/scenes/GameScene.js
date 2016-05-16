@@ -375,6 +375,13 @@ GameScene.prototype = Object.freeze(Object.create(Scene.prototype, {
             var player = Network.clients[data.dead].gameObject;
             player.solid = false;
             player.setState(Player.STATE.EXPLOSION);
+            
+            // Play sound effect
+            var volume = 0.5;
+            if (player != this.player) {
+                volume = 0.3;
+            }
+            createjs.Sound.play(Assets.SE_EXPLOSION, {volume : volume});
         }
     },
 

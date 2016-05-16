@@ -19,6 +19,11 @@ module.exports = {
     EXPLOSION_END : "./assets/img/ExplosionEnd.png",
     HP_FULL       : "./assets/img/HealthOrbFull.png",
     HP_EMPTY      : "./assets/img/HealthOrbEmpty.png",
+    
+    SE_SHOOT      : "./assets/sound/se_Shoot.ogg",
+    SE_CRASH      : "./assets/sound/se_Crash.ogg",
+    SE_EXHAUST    : "./assets/sound/se_Exhaust.ogg",
+    SE_EXPLOSION  : "./assets/sound/se_Explosion.ogg",
 
     // Preloader replaces getter with appropriate definition
     get        : function (path) { }

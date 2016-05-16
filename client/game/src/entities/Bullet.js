@@ -4,6 +4,7 @@ var util = require('../util');
 var Assets = util.Assets;
 var GameObject = wfl.core.entities.GameObject;
 var PhysicsObject = wfl.core.entities.PhysicsObject;
+var Network = require('../network');
 var geom = wfl.geom;
 
 /**
@@ -45,6 +46,12 @@ var Bullet = function (damage, creator) {
     this.lifeTime = Bullet.DEFAULT_MAX_LIFE_TIME;
     this.maxSpeed = Bullet.DEFAULT_MAX_SPEED;
     this.solid = true;
+    
+    var volume = 0.38;
+    if (creator !== Network.localClient.gameObject) {
+        volume = 0.1;
+    }
+    createjs.Sound.play(Assets.SE_SHOOT, {volume : volume});
 };
 Object.defineProperties(Bullet, {
     DEFAULT_MAX_LIFE_TIME : {

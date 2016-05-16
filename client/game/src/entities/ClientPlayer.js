@@ -8,6 +8,9 @@ var geom = wfl.geom;
 
 var ClientPlayer = function (team) {
     Player.call(this, team);
+    
+    this.exhaustSound.volume = 0.05;
+    this.crashSound.volume = 0.25;
 };
 Object.defineProperties(ClientPlayer, {
     MINIMAP_FILL_STYLE : {

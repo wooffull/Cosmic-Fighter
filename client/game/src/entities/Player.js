@@ -59,6 +59,12 @@ var Player = function (team) {
     this.explosionState.addFrame(this.createFrame(this.explosionGraphic3, 2));
     this.explosionState.addFrame(this.createFrame(this.explosionGraphic4, Infinity));
     this.addState(Player.STATE.EXPLOSION, this.explosionState);
+    
+    this.exhaustSound = createjs.Sound.play(Assets.SE_EXHAUST, {volume : 0.225, loop : -1});
+    this.exhaustSound.paused = true;
+    
+    this.crashSound = createjs.Sound.play(Assets.SE_CRASH);
+    this.crashSound.paused = true;
 
     this.shootTimer = 0;
     this.maxShootTimer = Player.DEFAULT_MAX_SHOOT_TIMER;
@@ -132,6 +138,13 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                         var particlePosition = this.forward.clone().multiply(-this.defaultGraphic.height * 0.5);
                         this.exhaust.addParticle(particlePosition, this.velocity);
                     }
+
+                    if (this.exhaustSound.paused) {
+                        this.exhaustSound.paused = false;
+                        this.exhaustSound.play();
+                    }
+                } else {
+                    this.exhaustSound.paused = true;
                 }
 
                 // Update exhaust timer for when to add the next particle
@@ -217,9 +230,14 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
             var team = this.customData.team;
             var otherTeam = physObj.customData.team;
 
-            // If hitting something that's not on this team
+            // If not hitting a bullet from this team
             if (otherTeam === undefined || otherTeam !== team || physObj.takeDamage) {
                 LivingObject.prototype.resolveCollision.call(this, physObj, collisionData);
+                
+                // Can only crash into something if it's alive!
+                if (this.health > 0 && physObj.solid) {
+                    this.crashSound.play();
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ var Assets = require('./Assets.js');
 var Preloader = function (onComplete) {
     // Set up preloader
 	this.queue = new createjs.LoadQueue(false);
+	this.queue.installPlugin(createjs.Sound);
 
     // Replace definition of Asset getter to use the data from the queue
     Assets.get = this.queue.getResult.bind(this.queue);
@@ -16,14 +17,14 @@ var Preloader = function (onComplete) {
 
     var needToLoad = [];
 
-    // Prepare to load images
-    for (var img in Assets) {
-        var imgObj = {
-            id : img,
-            src : Assets[img]
+    // Prepare to load assets
+    for (var asset in Assets) {
+        var assetObj = {
+            id : asset,
+            src : Assets[asset]
         }
 
-        needToLoad.push(imgObj);
+        needToLoad.push(assetObj);
     }
 
 	this.queue.loadManifest(needToLoad);

@@ -20,19 +20,19 @@ var EmitterParticle = function () {
 };
 Object.defineProperties(EmitterParticle, {
     DEFAULT_LIFE_TIME : {
-        value : 100
+        value : 75
     },
 
     DEFAULT_START_SIZE : {
-        value : 5.0
+        value : 5.5
     },
 
     DEFAULT_DECAY_RATE : {
-        value : 2.35
+        value : 2.5
     },
 
     DEFAULT_EXPANSION_RATE : {
-        value : 0.25
+        value : 0.375
     },
 
     MAX_ALPHA : {

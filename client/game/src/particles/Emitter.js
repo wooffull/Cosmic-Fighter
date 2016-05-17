@@ -12,14 +12,19 @@ var Emitter = function () {
     this.particles = [];
     this.angleRange = Emitter.DEFAULT_ANGLE_OFFSET_RANGE;
     this.maxParticles = Emitter.DEFAULT_MAX_PARTICLES;
+    this.velocityPercentage = Emitter.DEFAULT_VELOCITY_PERCENTAGE;
 };
 Object.defineProperties(Emitter, {
     DEFAULT_ANGLE_OFFSET_RANGE : {
-        value : 0.675
+        value : Math.PI
     },
 
     DEFAULT_MAX_PARTICLES : {
         value : 150
+    },
+    
+    DEFAULT_VELOCITY_PERCENTAGE : {
+        value : 1.0
     }
 });
 Emitter.prototype = Object.freeze(Object.create(GameObject.prototype, {
@@ -34,6 +39,7 @@ Emitter.prototype = Object.freeze(Object.create(GameObject.prototype, {
             var particle = new EmitterParticle();
             particle.position = position.clone();
             particle.velocity = velocity.clone().multiply(-1);
+            particle.velocity.multiply(this.velocityPercentage);
             particle.velocity.rotate(angleOffset);
 
             // Choose from 2 colors

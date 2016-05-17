@@ -70,6 +70,7 @@ var Player = function (team) {
     this.maxShootTimer = Player.DEFAULT_MAX_SHOOT_TIMER;
 
     this.exhaust = new Emitter();
+    this.exhaust.velocityPercentage = 0.175;
     this.exhaustTimer = 0;
     this.maxExhaustTimer = Player.DEFAULT_MAX_EXHAUST_TIMER;
 
@@ -135,7 +136,7 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
                 if (this.acceleration.getMagnitudeSquared() > Player.MIN_EXHAUST_ACCELERATION * Player.MIN_EXHAUST_ACCELERATION) {
                     // Add the next particle for the exhaust if we're able to
                     if (this.exhaustTimer === 0) {
-                        var particlePosition = this.forward.clone().multiply(-this.defaultGraphic.height * 0.5);
+                        var particlePosition = this.forward.clone().multiply(-this.defaultGraphic.height * 0.5).add(this.position);
                         this.exhaust.addParticle(particlePosition, this.velocity);
                     }
 
@@ -180,7 +181,10 @@ Player.prototype = Object.freeze(Object.create(LivingObject.prototype, {
         value : function (ctx) {
             LivingObject.prototype.draw.call(this, ctx);
 
+            ctx.save();
+            ctx.translate(-this.position.x, -this.position.y);
             this.exhaust.draw(ctx);
+            ctx.restore();
         }
     },
 
